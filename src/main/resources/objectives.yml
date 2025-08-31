@@ -1,0 +1,10 @@
+objectives:
+  - name: "objectives.win.solo"
+    description: "objectives.win.solo.description"
+    type: "win_game"
+    mode: "solo"
+    amount: 1
+    interval: 86400
+    rewards:
+      currency: 10
+      exp: 5

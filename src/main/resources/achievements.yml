@@ -1,0 +1,10 @@
+achievements:
+  - name: "First Blood"
+    description: "Achieve your first kill in a BedWars match."
+    points: 10
+    criteria:
+      - type: "kill"
+        amount: 1
+    rewards:
+      currency: 5
+      exp: 2
