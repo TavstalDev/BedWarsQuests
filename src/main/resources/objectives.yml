@@ -1,10 +1,11 @@
 objectives:
-  - name: "objectives.win.solo"
-    description: "objectives.win.solo.description"
-    type: "win_game"
-    mode: "solo"
-    amount: 1
-    interval: 86400
-    rewards:
-      currency: 10
-      exp: 5
+  - id: "daily_kills"
+    name: "Sharp Slayer"
+    description: "Kill 5 players today."
+    conditions:
+      - event: PLAYER_KILL
+        count: 5
+    reward:
+      coins: 250
+      money: 100
+      exp: 50

@@ -1,10 +1,9 @@
 achievements:
-  - name: "First Blood"
-    description: "Achieve your first kill in a BedWars match."
-    points: 10
-    criteria:
-      - type: "kill"
-        amount: 1
-    rewards:
-      currency: 5
-      exp: 2
+  - id: "bed_destroyer"
+    name: "Bed Destroyer"
+    description: "Break 10 beds."
+    conditions:
+      - event: BED_BREAK
+        count: 10
+    reward:
+      coins: 500
