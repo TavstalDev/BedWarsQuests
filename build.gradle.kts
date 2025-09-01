@@ -63,6 +63,8 @@ dependencies {
     implementation("com.samjakob:SpiGUI:${spiGuiVersion}")
     // Custom library for core functionality
     implementation(files("libs/MineCoreLib-${mineCoreLibVersion}.jar"))
+    // BanyaszApi
+    implementation(files("libs/BanyaszApi-1.0.0.jar"))
 }
 
 // Disable the default JAR task
