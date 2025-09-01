@@ -1,11 +1,13 @@
 package io.github.tavstaldev.bedWarsQuests.events;
 
+import io.github.tavstaldev.bedWarsQuests.BedWarsQuests;
+import io.github.tavstaldev.bedWarsQuests.EvaluatorRegistry;
 import io.github.tavstaldev.bedWarsQuests.managers.PlayerCacheManager;
 import io.github.tavstaldev.bedWarsQuests.models.PlayerCache;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
@@ -29,12 +31,19 @@ public class PlayerEventListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent event) {
-
-    }
-
-    @EventHandler
     public void onItemPickup(PlayerAttemptPickupItemEvent event) {
+        if (event.isCancelled())
+            return;
 
+        var player = event.getPlayer();
+        // Ignore if not in survival mode
+        if (player.getGameMode() != GameMode.SURVIVAL)
+            return;
+
+        // Ignore if not in a game
+        if (!BedWarsQuests.BedwarsApi().isPlayerPlayingAnyGame(player))
+            return;
+
+        EvaluatorRegistry.handleEvent(event, player);
     }
 }

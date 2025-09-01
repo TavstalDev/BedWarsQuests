@@ -2,6 +2,7 @@ package io.github.tavstaldev.bedWarsQuests;
 
 import com.samjakob.spigui.SpiGUI;
 import io.github.tavstaldev.banyaszLib.api.BanyaszApi;
+import io.github.tavstaldev.bedWarsQuests.conditions.evaluators.BedBreakEvaluator;
 import io.github.tavstaldev.bedWarsQuests.events.BedWarsEventListener;
 import io.github.tavstaldev.bedWarsQuests.events.BlockEventListener;
 import io.github.tavstaldev.bedWarsQuests.events.PlayerEventListener;
@@ -137,5 +138,9 @@ public class BedWarsQuests extends PluginBase {
         _logger.Debug("Reloading configuration...");
         this.reloadConfig();
         _logger.Debug("Configuration reloaded.");
+    }
+
+    private void registerEvaluators() {
+        EvaluatorRegistry.register("BED_BREAK", new BedBreakEvaluator());
     }
 }
