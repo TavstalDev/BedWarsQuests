@@ -7,7 +7,7 @@ prefix: BedWarsQuests
 authors: [ Tavstal ]
 description:
 website: https://tavstaldev.github.io/
-softdepend: [BedWars, ScreamingBedWars]
+softdepend: [BedWars, ScreamingBedWars, BanyaszLib]
 commands:
   bedwarsquests:
     description: Opens the BedWars arena selection GUI.

@@ -1,6 +1,10 @@
 package io.github.tavstaldev.bedWarsQuests;
 
 import com.samjakob.spigui.SpiGUI;
+import io.github.tavstaldev.banyaszLib.api.BanyaszApi;
+import io.github.tavstaldev.bedWarsQuests.events.BedWarsEventListener;
+import io.github.tavstaldev.bedWarsQuests.events.BlockEventListener;
+import io.github.tavstaldev.bedWarsQuests.events.PlayerEventListener;
 import io.github.tavstaldev.minecorelib.PluginBase;
 import io.github.tavstaldev.minecorelib.core.PluginLogger;
 import io.github.tavstaldev.minecorelib.core.PluginTranslator;
@@ -14,6 +18,7 @@ public class BedWarsQuests extends PluginBase {
     private final PluginTranslator _translator;
     private SpiGUI _spiGUI;
     private BedwarsAPI _bedwarsApi;
+    private BanyaszApi _banyaszApi;
 
     public static PluginLogger Logger() {
         return Instance.getCustomLogger();
@@ -34,6 +39,8 @@ public class BedWarsQuests extends PluginBase {
     public static BedwarsAPI BedwarsApi() {
         return Instance._bedwarsApi;
     }
+
+    public static BanyaszApi BanyaszApi() { return Instance._banyaszApi; }
 
     public BedWarsQuests() {
         super("BedWarsQuests",
@@ -57,7 +64,9 @@ public class BedWarsQuests extends PluginBase {
         }
 
         // Register Events
-        EventListener.init();
+        new PlayerEventListener(this);
+        new BlockEventListener(this);
+        new BedWarsEventListener(this);
 
         // Generate config file
         saveDefaultConfig();
@@ -76,6 +85,17 @@ public class BedWarsQuests extends PluginBase {
             _logger.Info("BedWars found and hooked into it.");
         } else {
             _logger.Warn("BedWars not found. Unloading...");
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        // Check BanyaszLib Plugin
+        _logger.Debug("Hooking into BanyaszLib...");
+        if (Bukkit.getPluginManager().isPluginEnabled("BanyaszLib")) {
+            _banyaszApi = BanyaszApi.getInstance();
+            _logger.Info("BanyaszLib found and hooked into it.");
+        } else {
+            _logger.Warn("BanyaszLib not found. Unloading...");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
