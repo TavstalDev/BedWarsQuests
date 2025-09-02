@@ -18,7 +18,7 @@ val paperApiVersion: String by project
 val snakeYamlVersion: String by project
 val mineCoreLibVersion: String by project
 val spiGuiVersion: String by project
-val bedWarsVersion: String by project
+val vaultApiVersion: String by project
 val projectPackageName = "${project.group}.bedWarsQuests"
 
 // Configure Java toolchain and compatibility settings
@@ -48,14 +48,19 @@ repositories {
         name = "CodeMC"
         url = uri("https://repo.codemc.io/repository/maven-public/")
     }
-    maven(url = uri("https://repo.screamingsandals.org/public/"))
 }
 
 // Define project dependencies
 dependencies {
     // Paper API for Minecraft server development
     compileOnly("io.papermc.paper:paper-api:${paperApiVersion}")
-    compileOnly("org.screamingsandals.bedwars:BedWars-API:${bedWarsVersion}")
+    compileOnly("com.github.MilkBowl:VaultAPI:${vaultApiVersion}") {
+        exclude(group = "org.bukkit", module = "bukkit")
+    }
+    // BedWarsApi
+    compileOnly(files("libs/BedWars-API-0.2.42-SNAPSHOT.jar"))
+    // BanyaszApi
+    compileOnly(files("libs/BanyaszApi-1.0.0.jar"))
 
     // YAML parsing library
     implementation("org.yaml:snakeyaml:${snakeYamlVersion}")
@@ -63,8 +68,6 @@ dependencies {
     implementation("com.samjakob:SpiGUI:${spiGuiVersion}")
     // Custom library for core functionality
     implementation(files("libs/MineCoreLib-${mineCoreLibVersion}.jar"))
-    // BanyaszApi
-    implementation(files("libs/BanyaszApi-1.0.0.jar"))
 }
 
 // Disable the default JAR task
