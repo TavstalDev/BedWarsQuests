@@ -1,7 +1,6 @@
 package io.github.tavstaldev.bedWarsQuests.events;
 
 import io.github.tavstaldev.bedWarsQuests.BedWarsQuests;
-import io.github.tavstaldev.bedWarsQuests.EvaluatorRegistry;
 import io.github.tavstaldev.bedWarsQuests.managers.PlayerCacheManager;
 import io.github.tavstaldev.bedWarsQuests.models.PlayerCache;
 import org.bukkit.GameMode;
@@ -44,6 +43,6 @@ public class PlayerEventListener implements Listener {
         if (!BedWarsQuests.BedwarsApi().isPlayerPlayingAnyGame(player))
             return;
 
-        EvaluatorRegistry.handleEvent(event, player);
+
     }
 }

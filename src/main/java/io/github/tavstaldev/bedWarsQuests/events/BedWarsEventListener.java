@@ -1,6 +1,5 @@
 package io.github.tavstaldev.bedWarsQuests.events;
 
-import io.github.tavstaldev.bedWarsQuests.EvaluatorRegistry;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -16,8 +15,7 @@ public class BedWarsEventListener implements Listener {
 
     @EventHandler
     public void onGameEnd(BedwarsGameEndEvent event) {
-        for (var player : event.getGame().getConnectedPlayers())
-            EvaluatorRegistry.handleEvent(event, player);
+
     }
 
     @EventHandler
@@ -25,16 +23,16 @@ public class BedWarsEventListener implements Listener {
         if (event.isCancelled())
             return;
 
-        EvaluatorRegistry.handleEvent(event, event.getCustomer());
+
     }
 
     @EventHandler
     public void onTargetBlockDestroyed(BedwarsTargetBlockDestroyedEvent event) {
-        EvaluatorRegistry.handleEvent(event, event.getPlayer());
+
     }
 
     @EventHandler
     public void onPlayerKilledEvent(BedwarsPlayerKilledEvent event) {
-        EvaluatorRegistry.handleEvent(event, event.getPlayer());
+
     }
 }
