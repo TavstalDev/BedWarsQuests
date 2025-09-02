@@ -2,10 +2,10 @@ package io.github.tavstaldev.bedWarsQuests;
 
 import com.samjakob.spigui.SpiGUI;
 import io.github.tavstaldev.banyaszLib.api.BanyaszApi;
-import io.github.tavstaldev.bedWarsQuests.conditions.evaluators.BedBreakEvaluator;
 import io.github.tavstaldev.bedWarsQuests.events.BedWarsEventListener;
 import io.github.tavstaldev.bedWarsQuests.events.BlockEventListener;
 import io.github.tavstaldev.bedWarsQuests.events.PlayerEventListener;
+import io.github.tavstaldev.bedWarsQuests.utils.EconomyUtils;
 import io.github.tavstaldev.minecorelib.PluginBase;
 import io.github.tavstaldev.minecorelib.core.PluginLogger;
 import io.github.tavstaldev.minecorelib.core.PluginTranslator;
@@ -101,6 +101,16 @@ public class BedWarsQuests extends PluginBase {
             return;
         }
 
+        // Register economy integration
+        _logger.Debug("Hooking into Vault...");
+        if (EconomyUtils.setupEconomy()) {
+            _logger.Info("Economy plugin found and hooked into Vault.");
+        } else {
+            _logger.Warn("Economy plugin not found. Unloading...");
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+
         // Initialize SpiGUI
         _logger.Debug("Initializing SpiGUI...");
         _spiGUI = new SpiGUI(this);
@@ -141,6 +151,6 @@ public class BedWarsQuests extends PluginBase {
     }
 
     private void registerEvaluators() {
-        EvaluatorRegistry.register("BED_BREAK", new BedBreakEvaluator());
+
     }
 }
