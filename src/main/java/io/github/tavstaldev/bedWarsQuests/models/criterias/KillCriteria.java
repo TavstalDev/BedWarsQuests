@@ -4,6 +4,7 @@ import io.github.tavstaldev.bedWarsQuests.BedWarsQuests;
 import io.github.tavstaldev.bedWarsQuests.models.AchievementCriteria;
 import org.bukkit.GameEvent;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.screamingsandals.bedwars.api.statistics.PlayerStatistic;
 
 public class KillCriteria extends AchievementCriteria {
@@ -15,7 +16,7 @@ public class KillCriteria extends AchievementCriteria {
     }
 
     @Override
-    public boolean isSatisfied(Player player, GameEvent event, boolean isAchievement) {
+    public boolean isSatisfied(Player player, Event event, boolean isAchievement) {
         PlayerStatistic statistic;
         if (isAchievement) {
             statistic = BedWarsQuests.BedwarsApi().getStatisticsManager().getStatistic(player.getUniqueId());

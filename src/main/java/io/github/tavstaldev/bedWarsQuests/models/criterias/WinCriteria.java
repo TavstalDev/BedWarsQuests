@@ -2,6 +2,7 @@ package io.github.tavstaldev.bedWarsQuests.models.criterias;
 
 import io.github.tavstaldev.bedWarsQuests.BedWarsQuests;
 import io.github.tavstaldev.bedWarsQuests.models.AchievementCriteria;
+import org.bukkit.event.Event;
 import org.screamingsandals.bedwars.api.statistics.PlayerStatistic;
 
 public class WinCriteria extends AchievementCriteria {
@@ -13,7 +14,7 @@ public class WinCriteria extends AchievementCriteria {
     }
 
     @Override
-    public boolean isSatisfied(org.bukkit.entity.Player player, org.bukkit.GameEvent event, boolean isAchievement)
+    public boolean isSatisfied(org.bukkit.entity.Player player, Event event, boolean isAchievement)
     {
         PlayerStatistic statistic;
         if (isAchievement) {
