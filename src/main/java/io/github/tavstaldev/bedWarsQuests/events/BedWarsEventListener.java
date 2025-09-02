@@ -1,12 +1,10 @@
 package io.github.tavstaldev.bedWarsQuests.events;
 
+import io.github.tavstaldev.bedWarsQuests.EventMapping;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
-import org.screamingsandals.bedwars.api.events.BedwarsGameEndEvent;
-import org.screamingsandals.bedwars.api.events.BedwarsItemBoughtEvent;
-import org.screamingsandals.bedwars.api.events.BedwarsPlayerKilledEvent;
-import org.screamingsandals.bedwars.api.events.BedwarsTargetBlockDestroyedEvent;
+import org.screamingsandals.bedwars.api.events.*;
 
 public class BedWarsEventListener implements Listener {
     public BedWarsEventListener(Plugin plugin) {
@@ -15,7 +13,15 @@ public class BedWarsEventListener implements Listener {
 
     @EventHandler
     public void onGameEnd(BedwarsGameEndEvent event) {
+        for (var player : event.getGame().getConnectedPlayers())
+            EventMapping.handleEvent(player, event);
+    }
 
+    @EventHandler
+    public void onPlayerLeave(BedwarsPlayerLeaveEvent event) {
+        if (!event.getGame().isActivated())
+            return;
+        EventMapping.handleEvent(event.getPlayer(), event);
     }
 
     @EventHandler
@@ -23,16 +29,18 @@ public class BedWarsEventListener implements Listener {
         if (event.isCancelled())
             return;
 
-
+        EventMapping.handleEvent(event.getCustomer(), event);
     }
 
     @EventHandler
     public void onTargetBlockDestroyed(BedwarsTargetBlockDestroyedEvent event) {
-
+        EventMapping.handleEvent(event.getPlayer(), event);
     }
 
     @EventHandler
     public void onPlayerKilledEvent(BedwarsPlayerKilledEvent event) {
-
+        // Handle both the killed player and the killer
+        EventMapping.handleEvent(event.getPlayer(), event);
+        EventMapping.handleEvent(event.getKiller(), event);
     }
 }

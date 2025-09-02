@@ -1,6 +1,7 @@
 package io.github.tavstaldev.bedWarsQuests.events;
 
 import io.github.tavstaldev.bedWarsQuests.BedWarsQuests;
+import io.github.tavstaldev.bedWarsQuests.EventMapping;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -26,7 +27,7 @@ public class BlockEventListener implements Listener {
         if (!BedWarsQuests.BedwarsApi().isPlayerPlayingAnyGame(player))
             return;
 
-
+        EventMapping.handleEvent(player, event);
     }
 
     @EventHandler
@@ -43,6 +44,6 @@ public class BlockEventListener implements Listener {
         if (!BedWarsQuests.BedwarsApi().isPlayerPlayingAnyGame(player))
             return;
 
-
+        EventMapping.handleEvent(player, event);
     }
 }
