@@ -1,9 +1,10 @@
 achievements:
-  - id: "bed_destroyer"
-    name: "Bed Destroyer"
-    description: "Break 10 beds."
-    conditions:
-      - event: BED_BREAK
-        count: 10
-    reward:
-      coins: 500
+  'first_win':
+    name: '&aFirst Win!'
+    description: '&7Win your first game.'
+    criteria:
+      type: 'win'
+      count: 1
+    rewards:
+      - type: 'vault'
+        amount: 50.0
