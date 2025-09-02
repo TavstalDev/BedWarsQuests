@@ -15,6 +15,7 @@ plugins {
 // Define project properties for versions and package name
 val javaVersion: String by project
 val paperApiVersion: String by project
+val hikariCpVersion: String by project
 val snakeYamlVersion: String by project
 val mineCoreLibVersion: String by project
 val spiGuiVersion: String by project
@@ -62,6 +63,9 @@ dependencies {
     // BanyaszApi
     compileOnly(files("libs/BanyaszApi-1.0.0.jar"))
 
+
+    // HikariCP for database connection pooling
+    implementation("com.zaxxer:HikariCP:${hikariCpVersion}")
     // YAML parsing library
     implementation("org.yaml:snakeyaml:${snakeYamlVersion}")
     // SpiGUI for GUI creation
