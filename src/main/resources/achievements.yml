@@ -2,9 +2,30 @@ achievements:
   'first_win':
     name: '&aFirst Win!'
     description: '&7Win your first game.'
+    triggers: ['game_end']
     criteria:
       type: 'win'
       count: 1
     rewards:
       - type: 'vault'
         amount: 50.0
+  'first_bed_destroy':
+    name: '&aFirst Bed Destroy!'
+    description: '&7Destroy your first bed.'
+    triggers: ['bed_destroy']
+    criteria:
+      type: 'bed_destroy'
+      count: 1
+    rewards:
+      - type: 'vault'
+        amount: 30.0
+  'first_blood':
+    name: '&aFirst Blood!'
+    description: '&7Get your first kill.'
+    triggers: ['player_death']
+    criteria:
+      type: 'kill'
+      count: 1
+    rewards:
+      - type: 'vault'
+        amount: 20.0

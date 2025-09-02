@@ -1,8 +1,39 @@
-# Supported locales: eng, hun
-locale: eng
+# Supported locales: hun
+locale: hun
 # If true, the plugin will try to use the player's locale
 usePlayerLocale: true
 # Prefix for all messages
 prefix: "&cBedWars&fQuests &8»"
 # Shows debug messages
 debug: false
+
+storage:
+  # Accepted values: SQLite (local), MySql (server)
+  type: SQLite
+  # Used for SQLite
+  filename: database
+  # MySql Settings
+  host: localhost
+  port: 3306
+  database: minecraft
+  username: root
+  password: ascent
+  tablePrefix: bwq
+
+# GUI settings
+gui:
+  placeholderItem: BLACK_STAINED_GLASS_PANE
+  noPreviousPageItem: BLACK_STAINED_GLASS_PANE
+  previousPageItem: ARROW
+  currentPageItem: PAPER
+  noNextPageItem: BLACK_STAINED_GLASS_PANE
+  nextPageItem: ARROW
+  closeItem: BARRIER
+  backItem: SPRUCE_DOOR
+  achievementItem: DIAMOND
+  dailyQuestItem: PAPER
+  completedDailyQuestItem: MAP
+  weeklyQuestItem: PAPER
+  completedWeeklyQuestItem: MAP
+  lockedAchievementItem: GRAY_DYE
+  completedAchievementItem: LIME_DYE
