@@ -2,9 +2,15 @@ package io.github.tavstaldev.bedWarsQuests;
 
 import com.samjakob.spigui.SpiGUI;
 import io.github.tavstaldev.banyaszLib.api.BanyaszApi;
+import io.github.tavstaldev.bedWarsQuests.commands.CommandGUI;
+import io.github.tavstaldev.bedWarsQuests.database.IDatabase;
+import io.github.tavstaldev.bedWarsQuests.database.MySqlDatabase;
+import io.github.tavstaldev.bedWarsQuests.database.SqlLiteDatabase;
 import io.github.tavstaldev.bedWarsQuests.events.BedWarsEventListener;
 import io.github.tavstaldev.bedWarsQuests.events.BlockEventListener;
 import io.github.tavstaldev.bedWarsQuests.events.PlayerEventListener;
+import io.github.tavstaldev.bedWarsQuests.managers.AchievementManager;
+import io.github.tavstaldev.bedWarsQuests.managers.ObjectiveManager;
 import io.github.tavstaldev.bedWarsQuests.utils.EconomyUtils;
 import io.github.tavstaldev.minecorelib.PluginBase;
 import io.github.tavstaldev.minecorelib.core.PluginLogger;
@@ -20,6 +26,9 @@ public class BedWarsQuests extends PluginBase {
     private SpiGUI _spiGUI;
     private BedwarsAPI _bedwarsApi;
     private BanyaszApi _banyaszApi;
+    private IDatabase _database;
+    private AchievementManager _achievementManager;
+    private ObjectiveManager _objectiveManager;
 
     public static PluginLogger Logger() {
         return Instance.getCustomLogger();
@@ -42,6 +51,15 @@ public class BedWarsQuests extends PluginBase {
     }
 
     public static BanyaszApi BanyaszApi() { return Instance._banyaszApi; }
+    public static IDatabase Database() {
+        return Instance._database;
+    }
+    public static AchievementManager AchievementManager() {
+        return Instance._achievementManager;
+    }
+    public static ObjectiveManager ObjectiveManager() {
+        return Instance._objectiveManager;
+    }
 
     public BedWarsQuests() {
         super("BedWarsQuests",
@@ -111,16 +129,38 @@ public class BedWarsQuests extends PluginBase {
             return;
         }
 
+        // Initialize database based on configuration
+        String databaseType = this.getConfig().getString("storage.type");
+        if (databaseType == null) {
+            databaseType = "sqlite";
+        }
+        switch (databaseType.toLowerCase()) {
+            case "mysql": {
+                _database = new MySqlDatabase();
+                break;
+            }
+            case "sqlite":
+            default: {
+                _database = new SqlLiteDatabase();
+                break;
+            }
+        }
+        _database.Load();
+        _database.CheckSchema();
+
         // Initialize SpiGUI
         _logger.Debug("Initializing SpiGUI...");
         _spiGUI = new SpiGUI(this);
 
         // Register Commands
         _logger.Debug("Registering commands...");
-        var command = getCommand("bwobjectives");
+        var command = getCommand("bwquests");
         if (command != null) {
-            //command.setExecutor(new CommandGUI());
+            command.setExecutor(new CommandGUI());
         }
+
+        _achievementManager = new AchievementManager(this);
+        _objectiveManager = new ObjectiveManager(this);
 
         _logger.Ok(String.format("%s has been successfully loaded.", getProjectName()));
         isUpToDate().thenAccept(upToDate -> {
@@ -148,9 +188,5 @@ public class BedWarsQuests extends PluginBase {
         _logger.Debug("Reloading configuration...");
         this.reloadConfig();
         _logger.Debug("Configuration reloaded.");
-    }
-
-    private void registerEvaluators() {
-
     }
 }
