@@ -2,6 +2,7 @@ package io.github.tavstaldev.bedWarsQuests;
 
 import io.github.tavstaldev.bedWarsQuests.managers.PlayerCacheManager;
 import io.github.tavstaldev.bedWarsQuests.models.Achievement;
+import io.github.tavstaldev.bedWarsQuests.models.ECompletionKind;
 import io.github.tavstaldev.bedWarsQuests.models.PlayerCache;
 import io.github.tavstaldev.bedWarsQuests.models.database.CompletedAchievementData;
 import org.bukkit.entity.Player;
@@ -13,6 +14,7 @@ import org.screamingsandals.bedwars.api.events.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class EventMapping {
     private static final Map<String, Class<? extends Event>> eventMap = Map.of(
@@ -43,8 +45,8 @@ public class EventMapping {
         if (trigger == null)
             return;
 
-        String playerId = player.getUniqueId().toString();
-        PlayerCache cache = PlayerCacheManager.get(player.getUniqueId());
+        UUID playerUuid = player.getUniqueId();
+        PlayerCache cache = PlayerCacheManager.get(playerUuid);
 
         List<Achievement> achievements = BedWarsQuests.AchievementManager().getAchievementsByTrigger(trigger);
         for (Achievement achievement : achievements) {
@@ -52,10 +54,10 @@ public class EventMapping {
                 continue;
 
             if (achievement.Criteria.isSatisfied(player, event, true)) {
-                BedWarsQuests.Database().AddCompletedAchievement(playerId, achievement.Id);
+                BedWarsQuests.Database().addCompletedAchievement(playerUuid, achievement.Id);
                 // Save to cache
-                cache.addAchievement(new CompletedAchievementData(player.getUniqueId(), achievement.Id));
-                achievement.complete(player, true);
+                cache.addAchievement(new CompletedAchievementData(playerUuid, achievement.Id));
+                achievement.complete(player, ECompletionKind.Achievement);
             }
         }
 
@@ -73,20 +75,20 @@ public class EventMapping {
                 if (cache.isWeeklyObjectiveCompleted(objective.Id))
                     continue;
 
-                BedWarsQuests.Database().UpdatePlayerWeeklyObjective(playerId, objective.Id, true);
+                BedWarsQuests.Database().updatePlayerWeeklyObjective(playerUuid, objective.Id, true);
                 // Update in cache
                 cache.completeWeeklyObjective(objective.Id);
+                objective.complete(player, ECompletionKind.WeeklyObjective);
             }
             else {
                 if (cache.isDailyObjectiveCompleted(objective.Id))
                     continue;
 
-                BedWarsQuests.Database().UpdatePlayerDailyObjective(playerId, objective.Id, true);
+                BedWarsQuests.Database().updatePlayerDailyObjective(playerUuid, objective.Id, true);
                 // Update in cache
                 cache.completeDailyObjective(objective.Id);
+                objective.complete(player, ECompletionKind.DailyObjective);
             }
-
-            objective.complete(player, false);
         }
     }
 }

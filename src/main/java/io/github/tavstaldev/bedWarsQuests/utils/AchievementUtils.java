@@ -140,6 +140,12 @@ public class AchievementUtils {
                         criteria = new LoseCriteria(count);
                         break;
                     }
+                    case "played":
+                    {
+                        int count = (int) criteriaData.getOrDefault("count", 1);
+                        criteria = new GamesPlayedCriteria(count);
+                        break;
+                    }
                     default: {
                         _logger.Error("Unknown criteria type '" + type + "' in achievement '" + key + "'.");
                         continue;
@@ -183,7 +189,7 @@ public class AchievementUtils {
                             }
                             case "points":
                             case "achievement_points": {
-                                long points = (long) reward.getOrDefault("amount", 0);
+                                int points = (int) reward.getOrDefault("amount", 0);
                                 rewards.add(new AchievementPointReward(points));
                                 break;
                             }
