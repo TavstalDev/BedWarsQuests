@@ -8,21 +8,31 @@ import org.screamingsandals.bedwars.api.statistics.PlayerStatistic;
 public class WinCriteria extends AchievementCriteria {
     private final int count;
 
-    public WinCriteria(int count) {
-        super("win");
+    public WinCriteria(String operator, boolean isSingleMatch, int count) {
+        super("win", operator, isSingleMatch);
         this.count = count;
     }
 
     @Override
     public boolean isSatisfied(org.bukkit.entity.Player player, Event event, boolean isAchievement)
     {
+        int value = -1;
+        // For win criteria, singleMatch doesn't make sense, so we ignore it.
         PlayerStatistic statistic;
         if (isAchievement) {
             statistic = BedWarsQuests.BedwarsApi().getStatisticsManager().getStatistic(player.getUniqueId());
         } else {
             statistic = BedWarsQuests.BedwarsApi().getStatisticsManager().getDailyStatistic(player.getUniqueId());
         }
+        value = statistic.getWins();
 
-        return statistic.getWins() >= count;
+        return switch (getOperator()) {
+            case EQUALS -> value == count;
+            case NOT_EQUALS -> value != count;
+            case GREATER_THAN -> value > count;
+            case LESS_THAN -> value < count;
+            case GREATER_THAN_OR_EQUAL -> value >= count;
+            case LESS_THAN_OR_EQUAL -> value <= count;
+        };
     }
 }
