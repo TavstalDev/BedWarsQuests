@@ -22,6 +22,7 @@ public class PlayerCache {
     private List<CompletedAchievementData> _completedAchievements;
     private List<DailyObjectiveData> _dailyObjectives;
     private List<WeeklyObjectiveData> _weeklyObjectives;
+    private PlayerMatchStats _matchStats;
 
     public PlayerCache(Player player) {
         this._player = player;
@@ -32,6 +33,7 @@ public class PlayerCache {
         _completedAchievements = BedWarsQuests.Database().getPlayerCompletedAchievements(player.getUniqueId());
         _dailyObjectives = BedWarsQuests.Database().getPlayerDailyObjectives(player.getUniqueId());
         _weeklyObjectives = BedWarsQuests.Database().getPlayerWeeklyObjectives(player.getUniqueId());
+        _matchStats = new PlayerMatchStats();
 
         if (getDailyObjectives().isEmpty()) {
             generateDailyObjectives();
@@ -48,6 +50,10 @@ public class PlayerCache {
 
     public void setGuiOpened(boolean isGUIOpened) {
         this._isGUIOpened = isGUIOpened;
+    }
+
+    public PlayerMatchStats getMatchStats() {
+        return _matchStats;
     }
 
     //#region Database
