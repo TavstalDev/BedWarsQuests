@@ -3,10 +3,16 @@ General:
 
 Rewards:
   AchievementComplete: "%prefix% &aSikeresen teljesítetted a(z) &e%achievement_name% &akihívást!"
-  AchievementPoint: "%prefix% &aKaptál &e%amount% &akihívás pontot jutalomként!"
-  Vault: "%prefixx% &aKaptál &e%amount% &azsetont jutalomként!"
-  Experience: "%prefix% &aKaptál &e%amount% &aXP-t jutalomként!"
-  Coins: "%prefix% &aKaptál &e%amount% &a6BÉ-t&a jutalomként!"
+  AchievementPoint: "%prefix% &aKaptál &7%amount% &akihívás pontot jutalomként!"
+  Vault:
+    Achievement: "%prefix% &aKaptál &7%amount% T &ajutalomként a kihívásért!"
+    Quest: "%prefix% &aKaptál &7%amount% T &ajutalomként a küldetésért!"
+  Experience:
+    Achievement: "%prefix% &aKaptál &b%amount% XP-t &ajutalomként a kihívásért!"
+    Quest: "%prefix% &aKaptál &b%amount% XP-t &ajutalomként a küldetésért!"
+  Coins:
+    Achievement: "%prefix% &aKaptál &6%amount% BÉ-t &ajutalomként a kihívásért!"
+    Quest: "%prefix% &aKaptál &6%amount% BÉ-t &ajutalomként a küldetésért!"
   Command: "%prefix% &aJutalmad végrehajtva."
 
 Commands:
@@ -42,7 +48,6 @@ GUI:
   PreviousPage: "&7Előző oldal"
   NextPage: "&7Következő oldal"
   Page: "&7Oldal: &f%page%"
-  RewardFormat: "&7- %reward_amount%x %reward_name%"
   Completed: "&aKész"
   InProgress: "&eFolyamatban"
   Main:
@@ -70,7 +75,8 @@ GUI:
     - "&7Jutalmak:"
     - "%reward%"
     - " "
-    - "&8&oA napi küldetések minden nap éjfélkor frissülnek."
+    - "&8&oA napi küldetések minden nap"
+    - "&8&ohajnalban frissülnek."
   WeeklyQuestName: "&aHeti küldetés: &f%quest_name%"
   WeeklyQuestLore:
     - "%quest_description%"
@@ -79,7 +85,8 @@ GUI:
     - "&7Jutalmak:"
     - "%reward%"
     - " "
-    - "&8&oA heti küldetések minden hétfőn frissülnek."
+    - "&8&oA heti küldetések minden"
+    - "&8&ohétfőn frissülnek."
   AchievementData:
     LockedName: "&c%achievement_name%"
     UnlockedName: "&a%achievement_name%"
@@ -92,6 +99,12 @@ GUI:
     - "%status%"
     LockedStatus: "&cZárolva"
     UnlockedStatus: "&aTeljesítve"
+  Rewards:
+    AchievementPoint: "&7- &e%amount% &7kihívás pont"
+    Coins: "&7- &e%amount% &6BÉ"
+    Vault: "&7- &e%amount% &7tallér"
+    Experience: "&7- &e%amount% &7XP"
+    Command: "&7- &e%command%"
 
 
 # DO NOT TOUCH THIS. This helps to handle config related changes after updates.

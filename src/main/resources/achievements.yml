@@ -1,4 +1,58 @@
 data:
+  'game_plays_10':
+    name: 'Játékos!'
+    description: '&7Játssz le tíz játékot.'
+    triggers: [ 'game_end' ]
+    criteria:
+      type: 'played'
+      count: 10
+    rewards:
+      - type: 'vault'
+        amount: 20.0
+      - type: 'achievement_points'
+        amount: 5
+  'game_plays_50':
+    name: 'Veterán Játékos'
+    description: '&7Játssz le 50 játékot.'
+    triggers: [ 'game_end' ]
+    criteria:
+      type: 'game_end'
+      count: 50
+    rewards:
+      - type: 'vault'
+        amount: 100.0
+      - type: 'coins'
+        amount: 10
+      - type: 'achievement_points'
+        amount: 25
+  'game_plays_100':
+    name: 'Játék Mester'
+    description: '&7Játssz le 100 játékot.'
+    triggers: [ 'game_end' ]
+    criteria:
+      type: 'game_end'
+      count: 100
+    rewards:
+      - type: 'vault'
+        amount: 250.0
+      - type: 'coins'
+        amount: 25
+      - type: 'achievement_points'
+        amount: 50
+  'game_plays_500':
+    name: 'BedWars Legenda'
+    description: '&7Játssz le 500 játékot.'
+    triggers: [ 'game_end' ]
+    criteria:
+      type: 'game_end'
+      count: 500
+    rewards:
+      - type: 'vault'
+        amount: 1000.0
+      - type: 'coins'
+        amount: 100
+      - type: 'achievement_points'
+        amount: 200
   'first_win':
     name: 'Első győzelem!'
     description: '&7Nyerd meg az első játékodat.'
@@ -9,23 +63,175 @@ data:
     rewards:
       - type: 'vault'
         amount: 50.0
-  'first_bed_destroy':
-    name: 'Első ágy törés!'
-    description: '&7Törd el az első ágyadat.'
-    triggers: [ 'bed_destroy', 'game_end' ]
-    criteria:
-      type: 'bed_break'
-      count: 1
-    rewards:
-      - type: 'vault'
-        amount: 30.0
-  'first_blood':
-    name: 'Első vér!'
-    description: '&7Öld meg az első ellenfeledet.'
+      - type: 'achievement_points'
+        amount: 5
+  'kills_5':
+    name: 'Harcos'
+    description: '&7Ölj meg 5 játékost.'
     triggers: [ 'player_death', 'game_end' ]
     criteria:
       type: 'kill'
-      count: 1
+      count: 5
     rewards:
       - type: 'vault'
-        amount: 20.0
+        amount: 25.0
+      - type: 'achievement_points'
+        amount: 5
+  'wins_10':
+    name: 'Győztes Sorozat!'
+    description: '&7Nyerd meg 10 játékodat.'
+    triggers: [ 'game_end' ]
+    criteria:
+      type: 'win'
+      count: 10
+    rewards:
+      - type: 'vault'
+        amount: 250.0
+      - type: 'coins'
+        amount: 10
+      - type: 'achievement_points'
+        amount: 25
+  'wins_50':
+    name: 'Felfoghatatlan Győztes'
+    description: '&7Nyerd meg 50 játékodat.'
+    triggers: [ 'game_end' ]
+    criteria:
+      type: 'win'
+      count: 50
+    rewards:
+      - type: 'vault'
+        amount: 1000.0
+      - type: 'coins'
+        amount: 50
+      - type: 'achievement_points'
+        amount: 100
+  'first_loss':
+    name: 'Az első vereség'
+    description: '&7Veszítsd el az első játékodat.'
+    triggers: [ 'game_end' ]
+    criteria:
+      type: 'lose'
+      count: 1
+    rewards:
+      - type: 'achievement_points'
+        amount: 1
+  'losses_10':
+    name: 'Megszokott'
+    description: '&7Veszíts el 10 játékot.'
+    triggers: [ 'game_end' ]
+    criteria:
+      type: 'lose'
+      count: 10
+    rewards:
+      - type: 'achievement_points'
+        amount: 5
+  'losses_50':
+    name: 'Mindig veszítek'
+    description: '&7Veszíts el 50 játékot.'
+    triggers: [ 'game_end' ]
+    criteria:
+      type: 'lose'
+      count: 50
+    rewards:
+      - type: 'achievement_points'
+        amount: 15
+  'kills_25':
+    name: 'Gyilkos'
+    description: '&7Ölj meg 25 játékost.'
+    triggers: [ 'player_death', 'game_end' ]
+    criteria:
+      type: 'kill'
+      count: 25
+    rewards:
+      - type: 'vault'
+        amount: 50.0
+      - type: 'achievement_points'
+        amount: 10
+  'kills_100':
+    name: 'Személyes Mészárlás'
+    description: '&7Ölj meg 100 játékost.'
+    triggers: [ 'player_death', 'game_end' ]
+    criteria:
+      type: 'kill'
+      count: 100
+    rewards:
+      - type: 'vault'
+        amount: 150.0
+      - type: 'coins'
+        amount: 15
+      - type: 'achievement_points'
+        amount: 30
+  'kills_500':
+    name: 'Igazi Harcos'
+    description: '&7Ölj meg 500 játékost.'
+    triggers: [ 'player_death', 'game_end' ]
+    criteria:
+      type: 'kill'
+      count: 500
+    rewards:
+      - type: 'vault'
+        amount: 500.0
+      - type: 'coins'
+        amount: 50
+      - type: 'achievement_points'
+        amount: 100
+  'first_death':
+    name: 'Az első halál'
+    description: '&7Halj meg először a játékban.'
+    triggers: [ 'player_death' ]
+    criteria:
+      type: 'death'
+      count: 1
+    rewards:
+      - type: 'achievement_points'
+        amount: 3
+  'deaths_25':
+    name: 'Szellem'
+    description: '&7Halj meg 25 alkalommal.'
+    triggers: [ 'player_death', 'game_end' ]
+    criteria:
+      type: 'death'
+      count: 25
+    rewards:
+      - type: 'achievement_points'
+        amount: 10
+  'bed_breaks_5':
+    name: 'Ágyromboló'
+    description: '&7Törj el 5 ágyat.'
+    triggers: [ 'bed_destroy', 'game_end' ]
+    criteria:
+      type: 'bed_break'
+      count: 5
+    rewards:
+      - type: 'vault'
+        amount: 50.0
+      - type: 'achievement_points'
+        amount: 10
+  'bed_breaks_25':
+    name: 'Ágy-Megsemmisítő'
+    description: '&7Törj el 25 ágyat.'
+    triggers: [ 'bed_destroy', 'game_end' ]
+    criteria:
+      type: 'bed_break'
+      count: 25
+    rewards:
+      - type: 'vault'
+        amount: 150.0
+      - type: 'coins'
+        amount: 15
+      - type: 'achievement_points'
+        amount: 30
+  'bed_breaks_100':
+    name: 'Ágypusztító'
+    description: '&7Törj el 100 ágyat.'
+    triggers: [ 'bed_destroy', 'game_end' ]
+    criteria:
+      type: 'bed_break'
+      count: 100
+    rewards:
+      - type: 'vault'
+        amount: 300.0
+      - type: 'coins'
+        amount: 30
+      - type: 'achievement_points'
+        amount: 75
