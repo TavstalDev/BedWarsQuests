@@ -14,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -73,7 +72,7 @@ public class MySqlDatabase implements IDatabase {
             // Completed Achievements
             sql = String.format("CREATE TABLE IF NOT EXISTS %s_comp_achievements (" +
                             "PlayerId VARCHAR(36), " +
-                            "AchievementId VARCHAR(64);",
+                            "AchievementId VARCHAR(64));",
                     getConfig().getString("storage.tablePrefix")
             );
             statement = connection.prepareStatement(sql);

@@ -31,7 +31,7 @@ public class SqlLiteDatabase implements IDatabase {
         try
         {
             Class.forName("org.sqlite.JDBC");
-            return DriverManager.getConnection(String.format("jdbc:sqlite:plugins/OpenKits/%s.db", getConfig().getString("storage.filename")));
+            return DriverManager.getConnection(String.format("jdbc:sqlite:plugins/BedWarsQuests/%s.db", getConfig().getString("storage.filename")));
         }
         catch (Exception ex)
         {
@@ -58,7 +58,7 @@ public class SqlLiteDatabase implements IDatabase {
             // Completed Achievements
             sql = String.format("CREATE TABLE IF NOT EXISTS %s_comp_achievements (" +
                             "PlayerId VARCHAR(36), " +
-                            "AchievementId VARCHAR(64);",
+                            "AchievementId VARCHAR(64));",
                     getConfig().getString("storage.tablePrefix")
             );
             statement = connection.prepareStatement(sql);
