@@ -25,38 +25,6 @@ public class PlayerEventListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         PlayerCache playerData = new PlayerCache(player);
-        if (playerData.getDailyObjectives().isEmpty()) {
-
-            var objectives = BedWarsQuests.ObjectiveManager().getObjectives();
-            if (!playerData.getWeeklyObjectives().isEmpty()) {
-                for (var weeklyObj : playerData.getWeeklyObjectives()) {
-                    objectives.removeIf(obj -> obj.Id.equals(weeklyObj.ObjectiveId));
-                }
-            }
-
-            Collections.shuffle(objectives);
-            int numToTake = Math.min(3, objectives.size());
-            for (var item : objectives.subList(0, numToTake)) {
-                BedWarsQuests.Database().AddPlayerDailyObjective(player.getUniqueId().toString(), item.Id);
-                playerData.addDailyObjective(new DailyObjectiveData(player.getUniqueId(), item.Id, false));
-            }
-        }
-
-        if (playerData.getWeeklyObjectives().isEmpty()) {
-            var objectives = BedWarsQuests.ObjectiveManager().getObjectives();
-            if (!playerData.getDailyObjectives().isEmpty()) {
-                for (var weeklyObj : playerData.getDailyObjectives()) {
-                    objectives.removeIf(obj -> obj.Id.equals(weeklyObj.ObjectiveId));
-                }
-            }
-            Collections.shuffle(objectives);
-            int numToTake = Math.min(3, objectives.size());
-            for (var item : objectives.subList(0, numToTake)) {
-                BedWarsQuests.Database().AddPlayerWeeklyObjective(player.getUniqueId().toString(), item.Id);
-                playerData.addWeeklyObjective(new WeeklyObjectiveData(player.getUniqueId(), item.Id, false));
-            }
-        }
-
         PlayerCacheManager.add(player.getUniqueId(), playerData);
     }
 
