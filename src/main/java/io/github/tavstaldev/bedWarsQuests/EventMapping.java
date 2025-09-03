@@ -48,7 +48,7 @@ public class EventMapping {
 
         List<Achievement> achievements = BedWarsQuests.AchievementManager().getAchievementsByTrigger(trigger);
         for (Achievement achievement : achievements) {
-            if (cache.IsAchievementCompleted(achievement.Id))
+            if (cache.isAchievementCompleted(achievement.Id))
                 continue;
 
             if (achievement.Criteria.isSatisfied(player, event, true)) {
@@ -62,7 +62,7 @@ public class EventMapping {
         List<Achievement> objectives = BedWarsQuests.ObjectiveManager().getObjectivesByTrigger(trigger);
         for (Achievement objective : objectives) {
 
-            Boolean isWeekly = cache.IsWeeklyObjective(objective.Id);
+            Boolean isWeekly = cache.isWeeklyObjective(objective.Id);
             if (isWeekly == null) // The player does not have this objective
                 continue;
 
@@ -70,7 +70,7 @@ public class EventMapping {
                 continue;
 
             if (isWeekly) {
-                if (cache.IsWeeklyObjectiveCompleted(objective.Id))
+                if (cache.isWeeklyObjectiveCompleted(objective.Id))
                     continue;
 
                 BedWarsQuests.Database().UpdatePlayerWeeklyObjective(playerId, objective.Id, true);
@@ -78,7 +78,7 @@ public class EventMapping {
                 cache.completeWeeklyObjective(objective.Id);
             }
             else {
-                if (cache.IsDailyObjectiveCompleted(objective.Id))
+                if (cache.isDailyObjectiveCompleted(objective.Id))
                     continue;
 
                 BedWarsQuests.Database().UpdatePlayerDailyObjective(playerId, objective.Id, true);

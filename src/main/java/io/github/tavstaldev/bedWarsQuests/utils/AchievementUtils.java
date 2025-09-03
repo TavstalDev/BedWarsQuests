@@ -5,6 +5,7 @@ import io.github.tavstaldev.bedWarsQuests.models.Achievement;
 import io.github.tavstaldev.bedWarsQuests.models.AchievementCriteria;
 import io.github.tavstaldev.bedWarsQuests.models.RewardAction;
 import io.github.tavstaldev.bedWarsQuests.models.criterias.*;
+import io.github.tavstaldev.bedWarsQuests.models.rewards.AchievementPointReward;
 import io.github.tavstaldev.bedWarsQuests.models.rewards.CoinsReward;
 import io.github.tavstaldev.bedWarsQuests.models.rewards.CommandReward;
 import io.github.tavstaldev.bedWarsQuests.models.rewards.VaultReward;
@@ -60,21 +61,21 @@ public class AchievementUtils {
                 return achievements;
             }
 
-            if (!yamlMap.containsKey("achievements")) {
-                _logger.Error("Invalid format in "+fileName+": Missing 'achievements' key.");
+            if (!yamlMap.containsKey("data")) {
+                _logger.Error("Invalid format in "+fileName+": Missing 'data' key.");
                 return achievements;
             }
 
-            Object achievementsObj = yamlMap.get("achievements");
+            Object achievementsObj = yamlMap.get("data");
             if (!(achievementsObj instanceof Map))
             {
-                _logger.Error("Invalid format in "+fileName+": 'achievements' is not a map.");
+                _logger.Error("Invalid format in "+fileName+": 'data' is not a map.");
                 return achievements;
             }
 
             Map<String, Object> achievementsMap = TypeUtils.castAsMap(achievementsObj, _logger);
             if (achievementsMap == null) {
-                _logger.Error("Invalid format in "+fileName+": Unable to cast 'achievements' to map.");
+                _logger.Error("Invalid format in "+fileName+": Unable to cast 'data' to map.");
                 return achievements;
             }
 
@@ -178,6 +179,12 @@ public class AchievementUtils {
                                 var command = (String) reward.get("command");
                                 var asConsole = (boolean) reward.getOrDefault("asConsole", false);
                                 rewards.add(new CommandReward(command, asConsole));
+                                break;
+                            }
+                            case "points":
+                            case "achievement_points": {
+                                long points = (long) reward.getOrDefault("amount", 0);
+                                rewards.add(new AchievementPointReward(points));
                                 break;
                             }
                         }
