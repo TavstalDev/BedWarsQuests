@@ -24,10 +24,16 @@ public class PlayerMatchStats {
     }
 
     public int getBlocksPlaced(String material) {
+        if (material.equalsIgnoreCase("any")) {
+            return BlocksPlaced.values().stream().mapToInt(Integer::intValue).sum();
+        }
         return BlocksPlaced.getOrDefault(material, 0);
     }
 
     public int getBlocksBroken(String material) {
+        if (material.equalsIgnoreCase("any")) {
+            return BlocksBroken.values().stream().mapToInt(Integer::intValue).sum();
+        }
         return BlocksBroken.getOrDefault(material, 0);
     }
 
