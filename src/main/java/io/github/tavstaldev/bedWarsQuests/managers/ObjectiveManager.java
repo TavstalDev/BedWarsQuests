@@ -26,7 +26,7 @@ public class ObjectiveManager {
     }
 
     public List<Achievement> getObjectives() {
-        return objectives;
+        return new ArrayList<>(objectives);
     }
 
     public List<Achievement> getObjectivesByTrigger(String trigger) {

@@ -2,28 +2,15 @@ package io.github.tavstaldev.bedWarsQuests.managers;
 
 import io.github.tavstaldev.bedWarsQuests.BedWarsQuests;
 import io.github.tavstaldev.bedWarsQuests.models.Achievement;
-import io.github.tavstaldev.bedWarsQuests.models.AchievementCriteria;
-import io.github.tavstaldev.bedWarsQuests.models.RewardAction;
 import io.github.tavstaldev.bedWarsQuests.models.criterias.*;
-import io.github.tavstaldev.bedWarsQuests.models.rewards.CoinsReward;
-import io.github.tavstaldev.bedWarsQuests.models.rewards.CommandReward;
-import io.github.tavstaldev.bedWarsQuests.models.rewards.VaultReward;
 import io.github.tavstaldev.bedWarsQuests.utils.AchievementUtils;
 import io.github.tavstaldev.minecorelib.core.PluginLogger;
-import io.github.tavstaldev.minecorelib.utils.TypeUtils;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginBase;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class AchievementManager {
     private final PluginLogger _logger = BedWarsQuests.Logger().WithModule(AchievementManager.class);
@@ -40,7 +27,7 @@ public class AchievementManager {
     }
 
     public List<Achievement> getAchievements() {
-        return achievements;
+        return new ArrayList<>(achievements);
     }
 
     public List<Achievement> getAchievementsByTrigger(String trigger) {
