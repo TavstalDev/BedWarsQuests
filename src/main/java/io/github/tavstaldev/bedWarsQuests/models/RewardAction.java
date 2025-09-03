@@ -4,7 +4,8 @@ import org.bukkit.entity.Player;
 
 public abstract class RewardAction {
     private final String type;
-    public abstract void grant(Player player);
+    public abstract void grant(Player player, boolean isAchievement);
+    public abstract String getLore(Player player);
 
     public RewardAction(String type) {
         this.type = type;

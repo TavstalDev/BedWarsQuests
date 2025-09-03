@@ -23,13 +23,25 @@ public class Achievement {
         Rewards = rewards;
     }
 
-    public void complete(Player player, boolean isAchievement) {
+    public void complete(Player player, ECompletionKind kind) {
 
-        if (isAchievement)
-            BedWarsQuests.Instance.sendLocalizedMsg(player, "Rewards.Achievement", Map.of("achievement_name", Name));
+        switch (kind) {
+            case Achievement: {
+                BedWarsQuests.Instance.sendLocalizedMsg(player, "Rewards.AchievementComplete", Map.of("achievement_name", Name));
+                break;
+            }
+            case DailyObjective: {
+                BedWarsQuests.Database().increaseCompletedDailyObjectives(player.getUniqueId());
+                break;
+            }
+            case WeeklyObjective: {
+                BedWarsQuests.Database().increaseCompletedWeeklyObjectives(player.getUniqueId());
+                break;
+            }
+        }
 
         for (RewardAction reward : Rewards) {
-            reward.grant(player);
+            reward.grant(player, kind == ECompletionKind.Achievement);
         }
     }
 }
