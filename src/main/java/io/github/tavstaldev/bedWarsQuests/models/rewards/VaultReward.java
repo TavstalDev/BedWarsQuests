@@ -16,11 +16,19 @@ public class VaultReward extends RewardAction {
     }
 
     @Override
-    public void grant(Player player) {
+    public void grant(Player player, boolean isAchievement) {
         if (!EconomyUtils.isEnabled())
             return;
 
         EconomyUtils.deposit(player, amount);
-        BedWarsQuests.Instance.sendLocalizedMsg(player, "Rewards.Vault", Map.of("amount", String.valueOf(amount)));
+        if (isAchievement)
+            BedWarsQuests.Instance.sendLocalizedMsg(player, "Rewards.Vault.Achievement", Map.of("amount", String.valueOf(amount)));
+        else
+            BedWarsQuests.Instance.sendLocalizedMsg(player, "Rewards.Vault.Quest", Map.of("amount", String.valueOf(amount)));
+    }
+
+    @Override
+    public String getLore(Player player) {
+        return  BedWarsQuests.Translator().Localize(player, "GUI.Rewards.Vault", Map.of("amount", String.valueOf(amount)));
     }
 }
