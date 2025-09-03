@@ -70,6 +70,7 @@ data:
       type: 'block_break'
       single_match: true
       operator: '>='
+      material: "any"
       count: 5
     rewards:
       - type: 'vault'
@@ -95,7 +96,6 @@ data:
       type: 'item_bought'
       single_match: true
       operator: '>='
-      material: "any"
       count: 3
     rewards:
       - type: 'vault'
