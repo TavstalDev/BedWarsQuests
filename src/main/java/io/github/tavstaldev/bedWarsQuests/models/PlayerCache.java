@@ -10,6 +10,7 @@ import io.github.tavstaldev.bedWarsQuests.models.database.WeeklyObjectiveData;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 
 public class PlayerCache {
@@ -28,9 +29,17 @@ public class PlayerCache {
         this._mainMenu = null;
         this._achievementMenu = null;
         this._achievementPage = 1;
-        _completedAchievements = BedWarsQuests.Database().GetPlayerCompletedAchievements(player.getUniqueId().toString());
-        _dailyObjectives = BedWarsQuests.Database().GetPlayerDailyObjectives(player.getUniqueId().toString());
-        _weeklyObjectives = BedWarsQuests.Database().GetPlayerWeeklyObjectives(player.getUniqueId().toString());
+        _completedAchievements = BedWarsQuests.Database().getPlayerCompletedAchievements(player.getUniqueId());
+        _dailyObjectives = BedWarsQuests.Database().getPlayerDailyObjectives(player.getUniqueId());
+        _weeklyObjectives = BedWarsQuests.Database().getPlayerWeeklyObjectives(player.getUniqueId());
+
+        if (getDailyObjectives().isEmpty()) {
+            generateDailyObjectives();
+        }
+
+        if (getWeeklyObjectives().isEmpty()) {
+           generateWeeklyObjectives();
+        }
     }
 
     public boolean isGuiOpened() {
@@ -122,6 +131,25 @@ public class PlayerCache {
         }
     }
 
+    public void generateDailyObjectives() {
+        // Wipe existing daily objectives from cache
+        _dailyObjectives.clear();
+
+        var objectives = BedWarsQuests.ObjectiveManager().getObjectives();
+        if (!getWeeklyObjectives().isEmpty()) {
+            for (var weeklyObj : getWeeklyObjectives()) {
+                objectives.removeIf(obj -> obj.Id.equals(weeklyObj.ObjectiveId));
+            }
+        }
+
+        Collections.shuffle(objectives);
+        int numToTake = Math.min(3, objectives.size());
+        for (var item : objectives.subList(0, numToTake)) {
+            BedWarsQuests.Database().addPlayerDailyObjective(_player.getUniqueId(), item.Id);
+            addDailyObjective(new DailyObjectiveData(_player.getUniqueId(), item.Id, false));
+        }
+    }
+
     public void setWeeklyObjectives(List<WeeklyObjectiveData> weeklyObjectives) {
         this._weeklyObjectives = weeklyObjectives;
     }
@@ -136,6 +164,24 @@ public class PlayerCache {
                 obj.IsCompleted = true;
                 return;
             }
+        }
+    }
+
+    public void generateWeeklyObjectives() {
+        // Wipe existing weekly objectives from cache
+        _weeklyObjectives.clear();
+
+        var objectives = BedWarsQuests.ObjectiveManager().getObjectives();
+        if (!getDailyObjectives().isEmpty()) {
+            for (var weeklyObj : getDailyObjectives()) {
+                objectives.removeIf(obj -> obj.Id.equals(weeklyObj.ObjectiveId));
+            }
+        }
+        Collections.shuffle(objectives);
+        int numToTake = Math.min(3, objectives.size());
+        for (var item : objectives.subList(0, numToTake)) {
+            BedWarsQuests.Database().addPlayerWeeklyObjective(_player.getUniqueId(), item.Id);
+            addWeeklyObjective(new WeeklyObjectiveData(_player.getUniqueId(), item.Id, false));
         }
     }
     //#endregion
