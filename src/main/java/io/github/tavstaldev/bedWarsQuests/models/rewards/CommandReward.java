@@ -1,5 +1,6 @@
 package io.github.tavstaldev.bedWarsQuests.models.rewards;
 
+import io.github.tavstaldev.bedWarsQuests.BedWarsQuests;
 import io.github.tavstaldev.bedWarsQuests.models.RewardAction;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -22,5 +23,6 @@ public class CommandReward extends RewardAction {
         } else {
             player.performCommand(cmd);
         }
+        BedWarsQuests.Instance.sendLocalizedMsg(player, "Rewards.Command");
     }
 }
