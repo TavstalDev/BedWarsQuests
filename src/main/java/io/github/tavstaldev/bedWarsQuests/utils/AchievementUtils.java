@@ -113,37 +113,74 @@ public class AchievementUtils {
                     continue;
                 }
                 String type = (String) criteriaData.get("type");
+                String operator = (String) criteriaData.getOrDefault("operator", "EQUALS");
+                boolean singleMatch = (boolean) criteriaData.getOrDefault("single_match", false);
                 switch (type) {
                     case "bed_break": {
                         int count = (int) criteriaData.getOrDefault("count", 1);
-                        criteria = new BedBreakCriteria(count);
+                        criteria = new BedBreakCriteria(operator, singleMatch, count);
                         break;
                     }
                     case "death": {
                         int count = (int) criteriaData.getOrDefault("count", 1);
-                        criteria = new DeathCriteria(count);
+                        criteria = new DeathCriteria(operator, singleMatch,count);
                         break;
                     }
                     case "kill": {
                         int count = (int) criteriaData.getOrDefault("count", 1);
-                        criteria = new KillCriteria(count);
+                        criteria = new KillCriteria(operator, singleMatch,count);
                         break;
                     }
                     case "win": {
                         int count = (int) criteriaData.getOrDefault("count", 1);
-                        criteria = new WinCriteria(count);
+                        criteria = new WinCriteria(operator, singleMatch,count);
                         break;
                     }
                     case "lose":
                     case "loss": {
                         int count = (int) criteriaData.getOrDefault("count", 1);
-                        criteria = new LoseCriteria(count);
+                        criteria = new LoseCriteria(operator, singleMatch,count);
                         break;
                     }
                     case "played":
                     {
                         int count = (int) criteriaData.getOrDefault("count", 1);
-                        criteria = new GamesPlayedCriteria(count);
+                        criteria = new GamesPlayedCriteria(operator, singleMatch,count);
+                        break;
+                    }
+                    case "block_place": {
+                        int count = (int) criteriaData.getOrDefault("count", 1);
+                        String material = (String) criteriaData.get("material");
+                        if (material == null) {
+                            _logger.Error("Missing 'material' for block_place criteria in achievement '" + key + "'.");
+                            continue;
+                        }
+                        criteria = new BlockPlaceCriteria(operator, singleMatch, count, material);
+                        break;
+                    }
+                    case "block_break": {
+                        int count = (int) criteriaData.getOrDefault("count", 1);
+                        String material = (String) criteriaData.get("material");
+                        if (material == null) {
+                            _logger.Error("Missing 'material' for block_break criteria in achievement '" + key + "'.");
+                            continue;
+                        }
+                        criteria = new BlockBreakCriteria(operator, singleMatch, count, material);
+                        break;
+                    }
+                    case "item_bought": {
+                        int count = (int) criteriaData.getOrDefault("count", 1);
+                        criteria = new ItemBoughtCriteria(operator, singleMatch, count);
+                        break;
+                    }
+                    case "killstreak": {
+                        int count = (int) criteriaData.getOrDefault("count", 1);
+                        criteria = new KillStreakCriteria(operator, singleMatch, count);
+                        break;
+                    }
+                    case "final_kill": {
+                        int count = (int) criteriaData.getOrDefault("count", 1);
+                        criteria = new FinalKillCriteria(operator, singleMatch, count);
                         break;
                     }
                     default: {
