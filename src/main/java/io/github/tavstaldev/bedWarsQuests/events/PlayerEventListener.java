@@ -33,21 +33,4 @@ public class PlayerEventListener implements Listener {
         Player player = event.getPlayer();
         PlayerCacheManager.remove(player.getUniqueId());
     }
-
-    @EventHandler
-    public void onItemPickup(PlayerAttemptPickupItemEvent event) {
-        if (event.isCancelled())
-            return;
-
-        var player = event.getPlayer();
-        // Ignore if not in survival mode
-        if (player.getGameMode() != GameMode.SURVIVAL)
-            return;
-
-        // Ignore if not in a game
-        if (!BedWarsQuests.BedwarsApi().isPlayerPlayingAnyGame(player))
-            return;
-
-        EventMapping.handleEvent(player, event);
-    }
 }
