@@ -54,7 +54,7 @@ public class PlayerCache {
         return _weeklyObjectives;
     }
 
-    public @Nullable Boolean IsWeeklyObjective(String objectiveId) {
+    public @Nullable Boolean isWeeklyObjective(String objectiveId) {
         for (WeeklyObjectiveData obj : _weeklyObjectives) {
             if (obj.ObjectiveId.equals(objectiveId)) {
                 return true;
@@ -70,7 +70,7 @@ public class PlayerCache {
         return null;
     }
 
-    public boolean IsAchievementCompleted(String achievementId) {
+    public boolean isAchievementCompleted(String achievementId) {
         for (CompletedAchievementData ach : _completedAchievements) {
             if (ach.AchievementId.equals(achievementId)) {
                 return true;
@@ -79,7 +79,7 @@ public class PlayerCache {
         return false;
     }
 
-    public boolean IsDailyObjectiveCompleted(String objectiveId) {
+    public boolean isDailyObjectiveCompleted(String objectiveId) {
         for (DailyObjectiveData obj : _dailyObjectives) {
             if (obj.ObjectiveId.equals(objectiveId) && obj.IsCompleted) {
                 return true;
@@ -88,7 +88,7 @@ public class PlayerCache {
         return false;
     }
 
-    public boolean IsWeeklyObjectiveCompleted(String objectiveId) {
+    public boolean isWeeklyObjectiveCompleted(String objectiveId) {
         for (WeeklyObjectiveData obj : _weeklyObjectives) {
             if (obj.ObjectiveId.equals(objectiveId) && obj.IsCompleted) {
                 return true;

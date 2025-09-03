@@ -1,8 +1,10 @@
 package io.github.tavstaldev.bedWarsQuests.models;
 
+import io.github.tavstaldev.bedWarsQuests.BedWarsQuests;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.Map;
 
 public class Achievement {
     public String Id;
@@ -22,7 +24,10 @@ public class Achievement {
     }
 
     public void complete(Player player, boolean isAchievement) {
-        // TODO: Notify player of completion
+
+        if (isAchievement)
+            BedWarsQuests.Instance.sendLocalizedMsg(player, "Rewards.Achievement", Map.of("achievement_name", Name));
+
         for (RewardAction reward : Rewards) {
             reward.grant(player);
         }
