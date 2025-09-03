@@ -24,12 +24,12 @@ public class MySqlDatabase implements IDatabase {
     private static final PluginLogger _logger = BedWarsQuests.Logger().WithModule(MySqlDatabase.class);
 
     @Override
-    public void Load() {
+    public void load() {
         _dataSource = CreateDataSource();
     }
 
     @Override
-    public void Unload() {
+    public void unload() {
         if (_dataSource != null) {
             if (!_dataSource.isClosed())
                 _dataSource.close();
@@ -55,7 +55,7 @@ public class MySqlDatabase implements IDatabase {
     }
 
     @Override
-    public void CheckSchema() {
+    public void checkSchema() {
         try (Connection connection = _dataSource.getConnection())
         {
             // PlayerData
@@ -106,7 +106,7 @@ public class MySqlDatabase implements IDatabase {
 
     //#region PlayerData
     @Override
-    public void AddPlayerData(String playerUUID) {
+    public void addPlayerData(UUID playerId) {
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("INSERT INTO %s_playerData (PlayerId, AchievementPoints, CompletedDailyObjectives, CompletedWeeklyObjectives) " +
@@ -115,7 +115,7 @@ public class MySqlDatabase implements IDatabase {
 
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 // Set parameters for the prepared statement
-                statement.setString(1, playerUUID);
+                statement.setString(1, playerId.toString());
                 statement.setInt(2, 0);
                 statement.setInt(3,0);
                 statement.setInt(4, 0);
@@ -131,7 +131,7 @@ public class MySqlDatabase implements IDatabase {
     }
 
     @Override
-    public void UpdatePlayerData(String playerUUID, long achievementPoints, int completedDailyObjectives, int completedWeeklyObjectives) {
+    public void updatePlayerData(UUID playerId, long achievementPoints, int completedDailyObjectives, int completedWeeklyObjectives) {
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("UPDATE %s_playerData SET AchievementPoints=?, CompletedDailyObjectives=?, CompletedWeeklyObjectives=? WHERE PlayerId=?;",
@@ -140,7 +140,7 @@ public class MySqlDatabase implements IDatabase {
                 statement.setLong(1, achievementPoints);
                 statement.setInt(2, completedDailyObjectives);
                 statement.setInt(3, completedWeeklyObjectives);
-                statement.setString(4, playerUUID);
+                statement.setString(4, playerId.toString());
                 statement.executeUpdate();
             }
         }
@@ -151,51 +151,66 @@ public class MySqlDatabase implements IDatabase {
     }
 
     @Override
-    public void UpdatePlayerData(String playerUUID, int completedDailyObjectives, int completedWeeklyObjectives) {
+    public void increaseAchievementPoints(UUID playerId, long points) {
         try (Connection connection = _dataSource.getConnection())
         {
-            String sql = String.format("UPDATE %s_playerData SET CompletedDailyObjectives=?, CompletedWeeklyObjectives=? WHERE PlayerId=?;",
+            String sql = String.format("UPDATE %s_playerData SET AchievementPoints=AchievementPoints+? WHERE PlayerId=?;",
                     getConfig().getString("storage.tablePrefix"));
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setInt(1, completedDailyObjectives);
-                statement.setInt(2, completedWeeklyObjectives);
-                statement.setString(3, playerUUID);
+                statement.setLong(1, points);
+                statement.setString(2, playerId.toString());
                 statement.executeUpdate();
             }
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while updating the playerData table...\n%s", ex.getMessage()));
+            _logger.Error(String.format("Unknown error happened while increasing achievement points in playerData table...\n%s", ex.getMessage()));
         }
     }
 
     @Override
-    public void UpdatePlayerData(String playerUUID, long achievementPoints) {
+    public void increaseCompletedDailyObjectives(UUID playerId) {
         try (Connection connection = _dataSource.getConnection())
         {
-            String sql = String.format("UPDATE %s_playerData SET AchievementPoints=? WHERE PlayerId=?;",
+            String sql = String.format("UPDATE %s_playerData SET CompletedDailyObjectives=CompletedDailyObjectives+1 WHERE PlayerId=?;",
                     getConfig().getString("storage.tablePrefix"));
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setLong(1, achievementPoints);
-                statement.setString(2, playerUUID);
+                statement.setString(1, playerId.toString());
                 statement.executeUpdate();
             }
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while updating the playerData table...\n%s", ex.getMessage()));
+            _logger.Error(String.format("Unknown error happened while increasing completed daily objectives in playerData table...\n%s", ex.getMessage()));
         }
     }
 
     @Override
-    public @Nullable PlayerData GetPlayerData(String playerUUID) {
+    public void increaseCompletedWeeklyObjectives(UUID playerId) {
+        try (Connection connection = _dataSource.getConnection())
+        {
+            String sql = String.format("UPDATE %s_playerData SET CompletedWeeklyObjectives=CompletedWeeklyObjectives+1 WHERE PlayerId=?;",
+                    getConfig().getString("storage.tablePrefix"));
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, playerId.toString());
+                statement.executeUpdate();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(String.format("Unknown error happened while increasing completed weekly objectives in playerData table...\n%s", ex.getMessage()));
+        }
+    }
+
+    @Override
+    public @Nullable PlayerData getPlayerData(UUID playerId) {
         PlayerData data = null;
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("SELECT * FROM %s_playerData WHERE PlayerId=? LIMIT 1;",
                     getConfig().getString("storage.tablePrefix"));
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, playerUUID);
+                statement.setString(1, playerId.toString());
                 try (ResultSet result = statement.executeQuery()) {
                     if (result.next()) {
                         data = new PlayerData(
@@ -220,7 +235,7 @@ public class MySqlDatabase implements IDatabase {
 
     //#region Daily Objectives
     @Override
-    public void AddPlayerDailyObjective(String playerUUID, String objectiveId) {
+    public void addPlayerDailyObjective(UUID playerId, String objectiveId) {
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("INSERT INTO %s_daily_obj (PlayerId, ObjectiveId, IsCompleted) " +
@@ -229,7 +244,7 @@ public class MySqlDatabase implements IDatabase {
 
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 // Set parameters for the prepared statement
-                statement.setString(1, playerUUID);
+                statement.setString(1, playerId.toString());
                 statement.setString(2, objectiveId);
                 statement.setBoolean(3,false);
 
@@ -244,14 +259,14 @@ public class MySqlDatabase implements IDatabase {
     }
 
     @Override
-    public void UpdatePlayerDailyObjective(String playerUUID, String objectiveId, boolean isCompleted) {
+    public void updatePlayerDailyObjective(UUID playerId, String objectiveId, boolean isCompleted) {
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("UPDATE %s_daily_obj SET IsCompleted=? WHERE PlayerId=? AND ObjectiveId=?;",
                     getConfig().getString("storage.tablePrefix"));
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setBoolean(1, isCompleted);
-                statement.setString(2, playerUUID);
+                statement.setString(2, playerId.toString());
                 statement.setString(3, objectiveId);
                 statement.executeUpdate();
             }
@@ -263,14 +278,14 @@ public class MySqlDatabase implements IDatabase {
     }
 
     @Override
-    public boolean HasPlayerCompletedDailyObjective(String playerUUID, String objectiveId) {
+    public boolean hasPlayerCompletedDailyObjective(UUID playerId, String objectiveId) {
         boolean data = false;
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("SELECT * FROM %s_daily_obj WHERE PlayerId=? AND ObjectiveId=? LIMIT 1;",
                     getConfig().getString("storage.tablePrefix"));
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, playerUUID);
+                statement.setString(1, playerId.toString());
                 statement.setString(2, objectiveId);
                 try (ResultSet result = statement.executeQuery()) {
                     if (result.next()) {
@@ -289,13 +304,12 @@ public class MySqlDatabase implements IDatabase {
     }
 
     @Override
-    public void WipePlayerDailyObjectives(String playerUUID) {
+    public void wipePlayerDailyObjectives() {
         try (Connection connection = _dataSource.getConnection())
         {
-            String sql = String.format("DELETE FROM %s_daily_obj WHERE PlayerId=?;",
+            String sql = String.format("TRUNCATE TABLE %s_daily_obj;",
                     getConfig().getString("storage.tablePrefix"));
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, playerUUID);
                 statement.executeUpdate();
             }
         }
@@ -306,14 +320,14 @@ public class MySqlDatabase implements IDatabase {
     }
 
     @Override
-    public List<DailyObjectiveData> GetPlayerDailyObjectives(String playerUUID) {
+    public List<DailyObjectiveData> getPlayerDailyObjectives(UUID playerId) {
         List<DailyObjectiveData> data = new ArrayList<>();
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("SELECT * FROM %s_daily_obj WHERE PlayerId=?;",
                     getConfig().getString("storage.tablePrefix"));
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, playerUUID);
+                statement.setString(1, playerId.toString());
                 try (ResultSet result = statement.executeQuery()) {
                     while (result.next()) {
                         data.add(new DailyObjectiveData(
@@ -337,7 +351,7 @@ public class MySqlDatabase implements IDatabase {
 
     //#region Weekly Objectives
     @Override
-    public void AddPlayerWeeklyObjective(String playerUUID, String objectiveId) {
+    public void addPlayerWeeklyObjective(UUID playerId, String objectiveId) {
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("INSERT INTO %s_weekly_obj (PlayerId, ObjectiveId, IsCompleted) " +
@@ -346,7 +360,7 @@ public class MySqlDatabase implements IDatabase {
 
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 // Set parameters for the prepared statement
-                statement.setString(1, playerUUID);
+                statement.setString(1, playerId.toString());
                 statement.setString(2, objectiveId);
                 statement.setBoolean(3,false);
 
@@ -361,14 +375,14 @@ public class MySqlDatabase implements IDatabase {
     }
 
     @Override
-    public void UpdatePlayerWeeklyObjective(String playerUUID, String objectiveId, boolean isCompleted) {
+    public void updatePlayerWeeklyObjective(UUID playerId, String objectiveId, boolean isCompleted) {
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("UPDATE %s_weekly_obj SET IsCompleted=? WHERE PlayerId=? AND ObjectiveId=?;",
                     getConfig().getString("storage.tablePrefix"));
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setBoolean(1, isCompleted);
-                statement.setString(2, playerUUID);
+                statement.setString(2, playerId.toString());
                 statement.setString(3, objectiveId);
                 statement.executeUpdate();
             }
@@ -380,14 +394,14 @@ public class MySqlDatabase implements IDatabase {
     }
 
     @Override
-    public boolean HasPlayerCompletedWeeklyObjective(String playerUUID, String objectiveId) {
+    public boolean hasPlayerCompletedWeeklyObjective(UUID playerId, String objectiveId) {
         boolean data = false;
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("SELECT * FROM %s_weekly_obj WHERE PlayerId=? AND ObjectiveId=? LIMIT 1;",
                     getConfig().getString("storage.tablePrefix"));
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, playerUUID);
+                statement.setString(1, playerId.toString());
                 statement.setString(2, objectiveId);
                 try (ResultSet result = statement.executeQuery()) {
                     if (result.next()) {
@@ -406,13 +420,12 @@ public class MySqlDatabase implements IDatabase {
     }
 
     @Override
-    public void WipePlayerWeeklyObjectives(String playerUUID) {
+    public void wipePlayerWeeklyObjectives() {
         try (Connection connection = _dataSource.getConnection())
         {
-            String sql = String.format("DELETE FROM %s_weekly_obj WHERE PlayerId=?;",
+            String sql = String.format("TRUNCATE TABLE %s_weekly_obj;",
                     getConfig().getString("storage.tablePrefix"));
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, playerUUID);
                 statement.executeUpdate();
             }
         }
@@ -423,14 +436,14 @@ public class MySqlDatabase implements IDatabase {
     }
 
     @Override
-    public List<WeeklyObjectiveData> GetPlayerWeeklyObjectives(String playerUUID) {
+    public List<WeeklyObjectiveData> getPlayerWeeklyObjectives(UUID playerId) {
         List<WeeklyObjectiveData> data = new ArrayList<>();
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("SELECT * FROM %s_weekly_obj WHERE PlayerId=?;",
                     getConfig().getString("storage.tablePrefix"));
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, playerUUID);
+                statement.setString(1, playerId.toString());
                 try (ResultSet result = statement.executeQuery()) {
                     while (result.next()) {
                         data.add(new WeeklyObjectiveData(
@@ -454,7 +467,7 @@ public class MySqlDatabase implements IDatabase {
 
     //#region Completed Achievements
     @Override
-    public void AddCompletedAchievement(String playerUUID, String achievementId) {
+    public void addCompletedAchievement(UUID playerId, String achievementId) {
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("INSERT INTO %s_comp_achievements (PlayerId, AchievementId) " +
@@ -463,7 +476,7 @@ public class MySqlDatabase implements IDatabase {
 
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 // Set parameters for the prepared statement
-                statement.setString(1, playerUUID);
+                statement.setString(1, playerId.toString());
                 statement.setString(2, achievementId);
 
                 // Execute the query
@@ -477,14 +490,14 @@ public class MySqlDatabase implements IDatabase {
     }
 
     @Override
-    public boolean HasPlayerCompletedAchievement(String playerUUID, String achievementId) {
+    public boolean hasPlayerCompletedAchievement(UUID playerId, String achievementId) {
         boolean data = false;
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("SELECT * FROM %s_comp_achievements WHERE PlayerId=? AND AchievementId=? LIMIT 1;",
                     getConfig().getString("storage.tablePrefix"));
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, playerUUID);
+                statement.setString(1, playerId.toString());
                 statement.setString(2, achievementId);
                 try (ResultSet result = statement.executeQuery()) {
                     if (result == null)
@@ -504,14 +517,14 @@ public class MySqlDatabase implements IDatabase {
     }
 
     @Override
-    public List<CompletedAchievementData> GetPlayerCompletedAchievements(String playerUUID) {
+    public List<CompletedAchievementData> getPlayerCompletedAchievements(UUID playerId) {
         List<CompletedAchievementData> data = new ArrayList<>();
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("SELECT * FROM %s_comp_achievements WHERE PlayerId=?;",
                     getConfig().getString("storage.tablePrefix"));
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, playerUUID);
+                statement.setString(1, playerId.toString());
                 try (ResultSet result = statement.executeQuery()) {
                     while (result.next()) {
                         data.add(new CompletedAchievementData(

@@ -7,56 +7,59 @@ import io.github.tavstaldev.bedWarsQuests.models.database.WeeklyObjectiveData;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface IDatabase {
 
-    void Load();
+    void load();
 
-    void Unload();
+    void unload();
 
-    void CheckSchema();
+    void checkSchema();
 
     //#region PlayerData
-    void AddPlayerData(String playerUUID);
+    void addPlayerData(UUID playerId);
 
-    void UpdatePlayerData(String playerUUID, long achievementPoints, int completedDailyObjectives, int completedWeeklyObjectives);
+    void updatePlayerData(UUID playerId, long achievementPoints, int completedDailyObjectives, int completedWeeklyObjectives);
 
-    void UpdatePlayerData(String playerUUID, int completedDailyObjectives, int completedWeeklyObjectives);
+    void increaseAchievementPoints(UUID playerId, long points);
 
-    void UpdatePlayerData(String playerUUID, long achievementPoints);
+    void increaseCompletedDailyObjectives(UUID playerId);
 
-    @Nullable PlayerData GetPlayerData(String playerUUID);
+    void increaseCompletedWeeklyObjectives(UUID playerId);
+
+    @Nullable PlayerData getPlayerData(UUID playerId);
     //#endregion
 
     //#region Daily Objectives
-    void AddPlayerDailyObjective(String playerUUID, String objectiveId);
+    void addPlayerDailyObjective(UUID playerId, String objectiveId);
 
-    void UpdatePlayerDailyObjective(String playerUUID, String objectiveId, boolean isCompleted);
+    void updatePlayerDailyObjective(UUID playerId, String objectiveId, boolean isCompleted);
 
-    boolean HasPlayerCompletedDailyObjective(String playerUUID, String objectiveId);
+    boolean hasPlayerCompletedDailyObjective(UUID playerId, String objectiveId);
 
-    void WipePlayerDailyObjectives(String playerUUID);
+    void wipePlayerDailyObjectives();
 
-    List<DailyObjectiveData> GetPlayerDailyObjectives(String playerUUID);
+    List<DailyObjectiveData> getPlayerDailyObjectives(UUID playerId);
     //#endregion
 
     //#region Weekly Objectives
-    void AddPlayerWeeklyObjective(String playerUUID, String objectiveId);
+    void addPlayerWeeklyObjective(UUID playerId, String objectiveId);
 
-    void UpdatePlayerWeeklyObjective(String playerUUID, String objectiveId, boolean isCompleted);
+    void updatePlayerWeeklyObjective(UUID playerId, String objectiveId, boolean isCompleted);
 
-    boolean HasPlayerCompletedWeeklyObjective(String playerUUID, String objectiveId);
+    boolean hasPlayerCompletedWeeklyObjective(UUID playerId, String objectiveId);
 
-    void WipePlayerWeeklyObjectives(String playerUUID);
+    void wipePlayerWeeklyObjectives();
 
-    List<WeeklyObjectiveData> GetPlayerWeeklyObjectives(String playerUUID);
+    List<WeeklyObjectiveData> getPlayerWeeklyObjectives(UUID playerId);
     //#endregion
 
     //#region Completed Achievements
-    void AddCompletedAchievement(String playerUUID, String achievementId);
+    void addCompletedAchievement(UUID playerId, String achievementId);
 
-    boolean HasPlayerCompletedAchievement(String playerUUID, String achievementId);
+    boolean hasPlayerCompletedAchievement(UUID playerId, String achievementId);
 
-    List<CompletedAchievementData> GetPlayerCompletedAchievements(String playerUUID);
+    List<CompletedAchievementData> getPlayerCompletedAchievements(UUID playerId);
     //#endregion
 }
