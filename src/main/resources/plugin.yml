@@ -9,7 +9,7 @@ description:
 website: https://tavstaldev.github.io/
 softdepend: [Vault, BedWars, ScreamingBedWars, BanyaszLib]
 commands:
-  bedwarsquests:
+  bwquests:
     description: Opens the BedWars arena selection GUI.
     usage: /bedwarsquests
     permission: bedwarsquests.commands.gui

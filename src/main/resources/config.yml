@@ -30,6 +30,7 @@ gui:
   nextPageItem: ARROW
   closeItem: BARRIER
   backItem: SPRUCE_DOOR
+  titleItem: RED_BED
   achievementItem: DIAMOND
   dailyQuestItem: PAPER
   completedDailyQuestItem: MAP
