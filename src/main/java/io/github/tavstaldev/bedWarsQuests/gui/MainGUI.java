@@ -147,10 +147,7 @@ public class MainGUI {
                     if (line.contains("%reward%"))
                     {
                         for (var reward : objective.Rewards) {
-                            lore.add(ChatUtils.translateColors(_translator.Localize("GUI.RewardFormat", Map.of(
-                                    "reward_amount", "TODO",
-                                    "reward_name", "TODO"
-                                    )), true));
+                            lore.add(ChatUtils.translateColors(reward.getLore(player), true));
                         }
                         continue;
                     }
@@ -209,10 +206,7 @@ public class MainGUI {
                     if (line.contains("%reward%"))
                     {
                         for (var reward : objective.Rewards) {
-                            lore.add(ChatUtils.translateColors(_translator.Localize("GUI.RewardFormat", Map.of(
-                                    "reward_amount", "TODO",
-                                    "reward_name", "TODO"
-                            )), true));
+                            lore.add(ChatUtils.translateColors(reward.getLore(player), true));
                         }
                         continue;
                     }
