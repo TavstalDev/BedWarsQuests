@@ -3,7 +3,6 @@ package io.github.tavstaldev.bedWarsQuests.gui;
 import com.samjakob.spigui.buttons.SGButton;
 import com.samjakob.spigui.menu.SGMenu;
 import io.github.tavstaldev.bedWarsQuests.BedWarsQuests;
-import io.github.tavstaldev.bedWarsQuests.managers.ObjectiveManager;
 import io.github.tavstaldev.bedWarsQuests.managers.PlayerCacheManager;
 import io.github.tavstaldev.bedWarsQuests.models.database.DailyObjectiveData;
 import io.github.tavstaldev.bedWarsQuests.models.database.WeeklyObjectiveData;
@@ -18,7 +17,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +39,19 @@ public class MainGUI {
                 menu.setButton(0, i, placeholderButton);
             }
 
+            // Title Button
+            Material titleMaterial = IconUtils.getMaterialFromConfig("gui.titleItem");
+            List<Component> titleLore = new ArrayList<>();
+            var rawRole = _translator.LocalizeList(player, "GUI.Main.Lore");
+            for (String line : rawRole) {
+                titleLore.add(ChatUtils.translateColors(line, true));
+            }
+
+            SGButton titleButton = new SGButton(
+                    GuiUtils.createItem(BedWarsQuests.Instance, titleMaterial, _translator.Localize(player, "GUI.Main.Item"), titleLore)
+            );
+            menu.setButton(0, 4, titleButton);
+
             // Close Button
             Material closeMaterial = IconUtils.getMaterialFromConfig("gui.closeItem");
             SGButton closeButton = new SGButton(
@@ -52,7 +63,7 @@ public class MainGUI {
             // Achievement Button
             Material achievementMaterial = IconUtils.getMaterialFromConfig("gui.achievementItem");
             SGButton achievementButton = new SGButton(
-                    GuiUtils.createItem(BedWarsQuests.Instance, achievementMaterial, _translator.Localize(player, "GUI.AchievementsItem"))
+                    GuiUtils.createItem(BedWarsQuests.Instance, achievementMaterial, _translator.Localize(player, "GUI.Achievements.Item"))
             ).withListener(event -> {
                 var data = PlayerCacheManager.get(playerId);
                 close(player);
@@ -93,10 +104,16 @@ public class MainGUI {
             for (int i = 0; i < 3; i++) {
                 int slot = i + 10;
 
+                if (i >= playerCache.getDailyObjectives().size())
+                {
+                    menu.removeButton(slot);
+                    continue;
+                }
+
                 DailyObjectiveData dailyObjectiveData = playerCache.getDailyObjectives().get(i);
                 if (dailyObjectiveData == null)
                 {
-                    menu.setButton(0, slot, null);
+                    menu.removeButton(slot);
                     continue;
                 }
 
@@ -107,11 +124,18 @@ public class MainGUI {
                     questMaterial = IconUtils.getMaterialFromConfig("gui.dailyQuestItem");
 
                 var objective = BedWarsQuests.ObjectiveManager().getObjectiveById(dailyObjectiveData.ObjectiveId);
+                if (objective == null) {
+                    _logger.Warn("Objective with ID " + dailyObjectiveData.ObjectiveId + " not found for player " + player.getName());
+                    menu.removeButton(slot);
+                    continue;
+                }
 
-                String[] rawRole = _translator.LocalizeArray(player, "GUI.DailyQuestLore");
+                var rawRole = _translator.LocalizeList(player, "GUI.DailyQuestLore");
                 String[] descriptionLines = objective.Description.split("\n");
                 List<Component> lore = new ArrayList<>();
+
                 String status = _translator.Localize(player, dailyObjectiveData.IsCompleted ? "GUI.Completed" : "GUI.InProgress");
+
                 for (String line : rawRole) {
                     if (line.contains("%quest_description%")) {
                         for (String descLine : descriptionLines) {
@@ -138,14 +162,21 @@ public class MainGUI {
                 menu.setButton(0, slot, new SGButton(stack));
             }
 
+
             // Weekly Quests
             for (int i = 0; i < 3; i++) {
                 int slot = i + 14;
 
+                if (i >= playerCache.getWeeklyObjectives().size())
+                {
+                    menu.removeButton(slot);
+                    continue;
+                }
+
                 WeeklyObjectiveData weeklyObjectiveData = playerCache.getWeeklyObjectives().get(i);
                 if (weeklyObjectiveData == null)
                 {
-                    menu.setButton(0, slot, null);
+                    menu.removeButton(slot);
                     continue;
                 }
 
@@ -156,10 +187,17 @@ public class MainGUI {
                     questMaterial = IconUtils.getMaterialFromConfig("gui.weeklyQuestItem");
 
                 var objective = BedWarsQuests.ObjectiveManager().getObjectiveById(weeklyObjectiveData.ObjectiveId);
-                String[] rawRole = _translator.LocalizeArray(player, "GUI.WeeklyQuestLore");
+                if (objective == null) {
+                    _logger.Warn("Objective with ID " + weeklyObjectiveData.ObjectiveId + " not found for player " + player.getName());
+                    menu.removeButton(slot);
+                    continue;
+                }
+                var rawRole = _translator.LocalizeList(player, "GUI.WeeklyQuestLore");
+
                 String[] descriptionLines = objective.Description.split("\n");
                 List<Component> lore = new ArrayList<>();
                 String status = _translator.Localize(player, weeklyObjectiveData.IsCompleted ? "GUI.Completed" : "GUI.InProgress");
+
                 for (String line : rawRole) {
                     if (line.contains("%quest_description%")) {
                         for (String descLine : descriptionLines) {

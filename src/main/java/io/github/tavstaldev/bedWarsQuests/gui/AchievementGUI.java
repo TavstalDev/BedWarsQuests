@@ -7,15 +7,22 @@ import io.github.tavstaldev.bedWarsQuests.managers.PlayerCacheManager;
 import io.github.tavstaldev.bedWarsQuests.utils.IconUtils;
 import io.github.tavstaldev.minecorelib.core.PluginLogger;
 import io.github.tavstaldev.minecorelib.core.PluginTranslator;
+import io.github.tavstaldev.minecorelib.utils.ChatUtils;
 import io.github.tavstaldev.minecorelib.utils.GuiUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 public class AchievementGUI {
     private static final PluginLogger _logger = BedWarsQuests.Logger().WithModule(MainGUI.class);
     private static final PluginTranslator _translator = BedWarsQuests.Instance.getTranslator();
-    private static final  Integer Rows = 3;
+    private static final Integer ItemsPerPage = 28;
+    private static final  Integer Rows = 6;
 
     public static SGMenu create(@NotNull Player player) {
         try {
@@ -30,6 +37,19 @@ public class AchievementGUI {
                 menu.setButton(0, i, placeholderButton);
             }
 
+            // Title Button
+            Material titleMaterial = IconUtils.getMaterialFromConfig("gui.achievementItem");
+            List<Component> titleLore = new ArrayList<>();
+            var rawRole = _translator.LocalizeList(player, "GUI.Achievements.Lore");
+            for (String line : rawRole) {
+                titleLore.add(ChatUtils.translateColors(line, true));
+            }
+
+            SGButton titleButton = new SGButton(
+                    GuiUtils.createItem(BedWarsQuests.Instance, titleMaterial, _translator.Localize(player, "GUI.Achievements.Item"), titleLore)
+            );
+            menu.setButton(0, 4, titleButton);
+
             // Back Button
             Material backMaterial = IconUtils.getMaterialFromConfig("gui.backItem");
             SGButton backButton = new SGButton(
@@ -38,7 +58,7 @@ public class AchievementGUI {
                 close(player);
                 MainGUI.open(player);
             });
-            menu.setButton(0, 18, backButton);
+            menu.setButton(0, 45, backButton);
             return menu;
         }
         catch (Exception ex) {
@@ -52,7 +72,7 @@ public class AchievementGUI {
         var playerCache = PlayerCacheManager.get(player.getUniqueId());
         // Show the GUI
         playerCache.setGuiOpened(true);
-        player.openInventory(playerCache.getMainMenu().getInventory());
+        player.openInventory(playerCache.getAchievementMenu().getInventory());
         refresh(player);
     }
 
@@ -66,10 +86,105 @@ public class AchievementGUI {
         try {
             var playerId = player.getUniqueId();
             var playerCache = PlayerCacheManager.get(playerId);
-            var menu = playerCache.getMainMenu();
+            var menu = playerCache.getAchievementMenu();
 
-            // TODO
+            var achievements = BedWarsQuests.AchievementManager().getAchievements();
+            int page = playerCache.getAchievementPage();
+            boolean hasPrevious = page > 1;
+            boolean hasNext = achievements.size() > page * ItemsPerPage;
 
+            //#region Previous Page Button
+            Material prevMaterial = hasPrevious ?
+                    IconUtils.getMaterialFromConfig("gui.previousPageItem")
+                    :
+                    IconUtils.getMaterialFromConfig("gui.noPreviousPageItem");
+            String prevName = hasPrevious ? _translator.Localize(player, "GUI.PreviousPage") : " ";
+            SGButton prevPageButton = new SGButton(
+                    GuiUtils.createItem(BedWarsQuests.Instance, prevMaterial, prevName )
+            ).withListener(event -> {
+                var playerCache_ = PlayerCacheManager.get(playerId);
+                if (playerCache_.getAchievementPage() > 1) {
+                    playerCache_.setAchievementPage(playerCache_.getAchievementPage() - 1);
+                    refresh(player);
+                }
+            });
+            menu.setButton(0, 48, prevPageButton);
+            //#endregion
+
+            //#region Page Indicator
+            Material pageMaterial = IconUtils.getMaterialFromConfig("gui.currentPageItem");
+            SGButton pageButton = new SGButton(
+                    GuiUtils.createItem(BedWarsQuests.Instance, pageMaterial, _translator.Localize(player, "GUI.Page", Map.of(
+                            "page", String.valueOf(page)))
+                    )
+            );
+            menu.setButton(0, 49, pageButton);
+            //#endregion
+
+            //#region Next Page Button
+            Material nextMaterial = hasNext ?
+                    IconUtils.getMaterialFromConfig("gui.nextPageItem")
+                    :
+                    IconUtils.getMaterialFromConfig("gui.noNextPageItem");
+            String nextName = hasNext ? _translator.Localize(player, "GUI.NextPage") : " ";
+            SGButton nextPageButton = new SGButton(GuiUtils.createItem(BedWarsQuests.Instance, nextMaterial,nextName)
+            ).withListener(event -> {
+                var playerCache_ = PlayerCacheManager.get(playerId);
+                int maxPage = 1 + achievements.size() / ItemsPerPage;
+                if (playerCache_.getAchievementPage() < maxPage) {
+                    playerCache_.setAchievementPage(playerCache_.getAchievementPage() + 1);
+                    refresh(player);
+                }
+            });
+            menu.setButton(0, 50, nextPageButton);
+            //#endregion
+
+            Material lockedAchievement = IconUtils.getMaterialFromConfig("gui.lockedAchievementItem");
+            Material completedAchievement = IconUtils.getMaterialFromConfig("gui.completedAchievementItem");
+            for (int i = 0; i < ItemsPerPage; i++) {
+                int index = i + (page - 1) * ItemsPerPage;
+                int slot = i + 10 + (2 * (i / 7));
+                if (index >= achievements.size()) {
+                    menu.removeButton(0, slot);
+                    continue;
+                }
+
+                var achievement = achievements.get(index);
+                boolean isCompleted = playerCache.isAchievementCompleted(achievement.Id);
+                Material material = isCompleted ? completedAchievement : lockedAchievement;
+
+                String displayName = BedWarsQuests.Translator().Localize(player, isCompleted ? "GUI.AchievementData.UnlockedName" : "GUI.AchievementData.LockedName", Map.of("achievement_name", achievement.Name));
+                String status = BedWarsQuests.Translator().Localize(player, isCompleted ? "GUI.AchievementData.UnlockedStatus" : "GUI.AchievementData.LockedStatus");
+
+                String[] descriptionLines = achievement.Description.split("\n");
+                var lore = new ArrayList<Component>();
+                var rawRole = _translator.LocalizeList(player, "GUI.AchievementData.Lore");
+                for (String line : rawRole) {
+                    if (line.contains("%achievement_description%")) {
+                        for (String descLine : descriptionLines) {
+                            lore.add(ChatUtils.translateColors(descLine, true));
+                        }
+                        continue;
+                    }
+
+                    if (line.contains("%reward%"))
+                    {
+                        for (var reward : achievement.Rewards) {
+                            lore.add(ChatUtils.translateColors(_translator.Localize("GUI.RewardFormat", Map.of(
+                                    "reward_amount", "TODO",
+                                    "reward_name", "TODO"
+                            )), true));
+                        }
+                        continue;
+                    }
+
+                    lore.add(ChatUtils.translateColors(line.replace("%status%", status), true));
+                }
+
+                var item = GuiUtils.createItem(BedWarsQuests.Instance, material, displayName, lore);
+                menu.setButton(0, slot, new SGButton(item));
+            }
+            
             player.openInventory(menu.getInventory());
         }
         catch (Exception ex) {
