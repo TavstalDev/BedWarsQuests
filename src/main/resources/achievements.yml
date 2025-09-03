@@ -1,3 +1,19 @@
+# Triggers
+# Types: game_end, player_death, player_leave, bed_destroy, item_bought, block_place, block_break
+
+# Criteria
+# single_match: true/false - if true, counts only from one match, if false counts from all matches
+# Types: played, win, lose, kill, death, bed_break, block_place, block_break, item_bought, final_kill, killstreak
+# win, lose, played - are not affected by single_match
+# block_place, block_break, item_bought, final_kill, killstreak - are only working with single_match: true
+# Operators: '>=', '<=', '>', '<', '==', '!='
+
+# Rewards
+# Types: vault, coins, achievement_points, command
+# vault - double
+# coins - integer
+# achievement_points - integer
+
 data:
   'game_plays_10':
     name: 'Játékos!'
@@ -5,6 +21,8 @@ data:
     triggers: [ 'game_end' ]
     criteria:
       type: 'played'
+      single_match: false
+      operator: '>='
       count: 10
     rewards:
       - type: 'vault'
@@ -17,6 +35,8 @@ data:
     triggers: [ 'game_end' ]
     criteria:
       type: 'game_end'
+      single_match: false
+      operator: '>='
       count: 50
     rewards:
       - type: 'vault'
@@ -31,6 +51,8 @@ data:
     triggers: [ 'game_end' ]
     criteria:
       type: 'game_end'
+      single_match: false
+      operator: '>='
       count: 100
     rewards:
       - type: 'vault'
@@ -45,6 +67,8 @@ data:
     triggers: [ 'game_end' ]
     criteria:
       type: 'game_end'
+      single_match: false
+      operator: '>='
       count: 500
     rewards:
       - type: 'vault'
@@ -59,6 +83,8 @@ data:
     triggers: [ 'game_end' ]
     criteria:
       type: 'win'
+      single_match: false
+      operator: '>='
       count: 1
     rewards:
       - type: 'vault'
@@ -71,6 +97,8 @@ data:
     triggers: [ 'player_death', 'game_end' ]
     criteria:
       type: 'kill'
+      single_match: false
+      operator: '>='
       count: 5
     rewards:
       - type: 'vault'
@@ -83,6 +111,8 @@ data:
     triggers: [ 'game_end' ]
     criteria:
       type: 'win'
+      single_match: false
+      operator: '>='
       count: 10
     rewards:
       - type: 'vault'
@@ -97,6 +127,8 @@ data:
     triggers: [ 'game_end' ]
     criteria:
       type: 'win'
+      single_match: false
+      operator: '>='
       count: 50
     rewards:
       - type: 'vault'
@@ -111,6 +143,8 @@ data:
     triggers: [ 'game_end' ]
     criteria:
       type: 'lose'
+      single_match: false
+      operator: '>='
       count: 1
     rewards:
       - type: 'achievement_points'
@@ -121,6 +155,8 @@ data:
     triggers: [ 'game_end' ]
     criteria:
       type: 'lose'
+      single_match: false
+      operator: '>='
       count: 10
     rewards:
       - type: 'achievement_points'
@@ -131,6 +167,8 @@ data:
     triggers: [ 'game_end' ]
     criteria:
       type: 'lose'
+      single_match: false
+      operator: '>='
       count: 50
     rewards:
       - type: 'achievement_points'
@@ -141,6 +179,8 @@ data:
     triggers: [ 'player_death', 'game_end' ]
     criteria:
       type: 'kill'
+      single_match: false
+      operator: '>='
       count: 25
     rewards:
       - type: 'vault'
@@ -153,6 +193,8 @@ data:
     triggers: [ 'player_death', 'game_end' ]
     criteria:
       type: 'kill'
+      single_match: false
+      operator: '>='
       count: 100
     rewards:
       - type: 'vault'
@@ -167,6 +209,8 @@ data:
     triggers: [ 'player_death', 'game_end' ]
     criteria:
       type: 'kill'
+      single_match: false
+      operator: '>='
       count: 500
     rewards:
       - type: 'vault'
@@ -181,6 +225,8 @@ data:
     triggers: [ 'player_death' ]
     criteria:
       type: 'death'
+      single_match: false
+      operator: '>='
       count: 1
     rewards:
       - type: 'achievement_points'
@@ -191,6 +237,8 @@ data:
     triggers: [ 'player_death', 'game_end' ]
     criteria:
       type: 'death'
+      single_match: false
+      operator: '>='
       count: 25
     rewards:
       - type: 'achievement_points'
@@ -201,6 +249,8 @@ data:
     triggers: [ 'bed_destroy', 'game_end' ]
     criteria:
       type: 'bed_break'
+      single_match: false
+      operator: '>='
       count: 5
     rewards:
       - type: 'vault'
@@ -213,6 +263,8 @@ data:
     triggers: [ 'bed_destroy', 'game_end' ]
     criteria:
       type: 'bed_break'
+      single_match: false
+      operator: '>='
       count: 25
     rewards:
       - type: 'vault'
@@ -227,6 +279,8 @@ data:
     triggers: [ 'bed_destroy', 'game_end' ]
     criteria:
       type: 'bed_break'
+      single_match: false
+      operator: '>='
       count: 100
     rewards:
       - type: 'vault'

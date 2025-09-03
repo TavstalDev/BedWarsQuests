@@ -5,6 +5,8 @@ data:
     triggers: [ 'game_end' ]
     criteria:
       type: 'win'
+      single_match: false
+      operator: '>='
       count: 1
     rewards:
       - type: 'vault'
@@ -15,6 +17,8 @@ data:
     triggers: [ 'bed_destroy', 'game_end' ]
     criteria:
       type: 'bed_break'
+      single_match: false
+      operator: '>='
       count: 1
     rewards:
       - type: 'vault'
@@ -25,6 +29,8 @@ data:
     triggers: [ 'player_death', 'game_end' ]
     criteria:
       type: 'kill'
+      single_match: false
+      operator: '>='
       count: 1
     rewards:
       - type: 'vault'
