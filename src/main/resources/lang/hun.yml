@@ -1,6 +1,14 @@
 General:
   NoPermission: "%prefix% &cNincs jogosultságod ehhez."
 
+Rewards:
+  AchievementComplete: "%prefix% &aSikeresen teljesítetted a(z) &e%achievement_name% &akihívást!"
+  AchievementPoint: "%prefix% &aKaptál &e%amount% &akihívás pontot jutalomként!"
+  Vault: "%prefixx% &aKaptál &e%amount% &azsetont jutalomként!"
+  Experience: "%prefix% &aKaptál &e%amount% &aXP-t jutalomként!"
+  Coins: "%prefix% &aKaptál &e%amount% &a6BÉ-t&a jutalomként!"
+  Command: "%prefix% &aJutalmad végrehajtva."
+
 Commands:
   ConsoleCaller: "%prefix% &cA parancsot csak játékosok használhatják."
   UnknownError: "%prefix% &cIsmeretlen hiba történt. Kérlek, jelentsd!"
@@ -34,14 +42,26 @@ GUI:
   PreviousPage: "&7Előző oldal"
   NextPage: "&7Következő oldal"
   Page: "&7Oldal: &f%page%"
-  AchievementsItem: "&aKihívások"
-  RewardFormat: "&7- %reward_amount%x %reward%_name"
+  RewardFormat: "&7- %reward_amount%x %reward_name%"
   Completed: "&aKész"
   InProgress: "&eFolyamatban"
   Main:
     Title: "&8Küldetések és Kihívások"
+    Item: "&aBedWars Küldetések és Kihívások"
+    Lore:
+      - "&7&m                                 "
+      - "&fNézd meg a küldetéseidet,"
+      - "&fkihívásaidat, és szerezd"
+      - "&fmeg a jutalmakat!"
+      - "&7&m                                 "
   Achievements:
     Title: "&8Kihívások"
+    Item: "&aKihívások"
+    Lore:
+      - "&7&m                                 "
+      - "&fNézd meg a kihívásaidat,"
+      - "&fés szerezd meg a jutalmakat!"
+      - "&7&m                                 "
   DailyQuestName: "&aNapi küldetés: &f%quest_name%"
   DailyQuestLore:
     - "&7%quest_description%"
@@ -50,7 +70,7 @@ GUI:
     - "&7Jutalmak:"
     - "%reward%"
     - " "
-    - "&8&oA napi küldetések minden nap éjfélkor refrissülnek."
+    - "&8&oA napi küldetések minden nap éjfélkor frissülnek."
   WeeklyQuestName: "&aHeti küldetés: &f%quest_name%"
   WeeklyQuestLore:
     - "%quest_description%"
@@ -59,7 +79,19 @@ GUI:
     - "&7Jutalmak:"
     - "%reward%"
     - " "
-    - "&8&oA heti küldetések minden hétfőn refrissülnek."
+    - "&8&oA heti küldetések minden hétfőn frissülnek."
+  AchievementData:
+    LockedName: "&c%achievement_name%"
+    UnlockedName: "&a%achievement_name%"
+    Lore:
+    - "%achievement_description%"
+    - " "
+    - "&7Jutalmak:"
+    - "%reward%"
+    - " "
+    - "%status%"
+    LockedStatus: "&cZárolva"
+    UnlockedStatus: "&aTeljesítve"
 
 
 # DO NOT TOUCH THIS. This helps to handle config related changes after updates.
