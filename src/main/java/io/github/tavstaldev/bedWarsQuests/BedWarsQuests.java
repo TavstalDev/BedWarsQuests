@@ -11,6 +11,7 @@ import io.github.tavstaldev.bedWarsQuests.events.BlockEventListener;
 import io.github.tavstaldev.bedWarsQuests.events.PlayerEventListener;
 import io.github.tavstaldev.bedWarsQuests.managers.AchievementManager;
 import io.github.tavstaldev.bedWarsQuests.managers.ObjectiveManager;
+import io.github.tavstaldev.bedWarsQuests.tasks.RefreshTask;
 import io.github.tavstaldev.bedWarsQuests.utils.EconomyUtils;
 import io.github.tavstaldev.minecorelib.PluginBase;
 import io.github.tavstaldev.minecorelib.core.PluginLogger;
@@ -22,7 +23,6 @@ import org.screamingsandals.bedwars.api.BedwarsAPI;
 
 public class BedWarsQuests extends PluginBase {
     public static BedWarsQuests Instance;
-    private final PluginTranslator _translator;
     private SpiGUI _spiGUI;
     private BedwarsAPI _bedwarsApi;
     private BanyaszApi _banyaszApi;
@@ -62,18 +62,14 @@ public class BedWarsQuests extends PluginBase {
     }
 
     public BedWarsQuests() {
-        super("BedWarsQuests",
-                "1.0.0",
-                "Tavstal",
-                "https://github.com/TavstalDev/BedWarsGUI/releases/latest",
-                new String[]{"eng", "hun"}
-        );
-        _translator = getTranslator();
+        super("https://github.com/TavstalDev/BedWarsQuests/releases/latest");
     }
 
     @Override
     public void onEnable() {
         Instance = this;
+        _config = new BWQConfiguration();
+        _translator = new PluginTranslator(this, new String[]{"eng", "hun"});
         _logger.Info(String.format("Loading %s...", getProjectName()));
 
         if (VersionUtils.isLegacy()) {
@@ -145,8 +141,8 @@ public class BedWarsQuests extends PluginBase {
                 break;
             }
         }
-        _database.Load();
-        _database.CheckSchema();
+        _database.load();
+        _database.checkSchema();
 
         // Initialize SpiGUI
         _logger.Debug("Initializing SpiGUI...");
@@ -159,8 +155,13 @@ public class BedWarsQuests extends PluginBase {
             command.setExecutor(new CommandGUI());
         }
 
+        // Initialize Managers
         _achievementManager = new AchievementManager(this);
         _objectiveManager = new ObjectiveManager(this);
+
+        // Register tasks
+        RefreshTask task = new RefreshTask();
+        this.getServer().getScheduler().scheduleSyncRepeatingTask(this, task, 20L * 30, 20L * 900);
 
         _logger.Ok(String.format("%s has been successfully loaded.", getProjectName()));
         isUpToDate().thenAccept(upToDate -> {
