@@ -1,3 +1,18 @@
+# Triggers
+# Types: game_end, player_death, player_leave, bed_destroy, item_bought, block_place, block_break
+
+# Criteria
+# single_match: true/false - if true, counts only from one match, if false counts from all matches
+# Types: played, win, lose, kill, death, bed_break, block_place, block_break, item_bought, final_kill, killstreak
+# win, lose, played - are not affected by single_match
+# block_place, block_break, item_bought, final_kill, killstreak - are only working with single_match: true
+# Operators: '>=', '<=', '>', '<', '==', '!='
+
+# Rewards
+# Types: vault, coins, command
+# vault - double
+# coins - integer
+
 data:
   'first_win':
     name: 'Első győzelem!'
@@ -35,3 +50,53 @@ data:
     rewards:
       - type: 'vault'
         amount: 20.0
+  'first_killstreak':
+    name: 'Első gyilkolási sorozat!'
+    description: '&7Szerezz egy gyilkolási sorozatot (2+ gyilkosság megszakítás nélkül).'
+    triggers: [ 'player_death' ]
+    criteria:
+      type: 'killstreak'
+      single_match: true
+      operator: '>='
+      count: 2
+    rewards:
+      - type: 'vault'
+        amount: 15.0
+  'break_5_blocks':
+    name: 'Kis bontó!'
+    description: '&7Törj össze 5 blokkot egy játék alatt.'
+    triggers: [ 'block_break' ]
+    criteria:
+      type: 'block_break'
+      single_match: true
+      operator: '>='
+      count: 5
+    rewards:
+      - type: 'vault'
+        amount: 10.0
+  'place_5_blocks':
+    name: 'Kis építő!'
+    description: '&7Helyezz el 5 blokkot egy játék alatt.'
+    triggers: [ 'block_place' ]
+    criteria:
+      type: 'block_place'
+      single_match: true
+      operator: '>='
+      material: "any"
+      count: 5
+    rewards:
+      - type: 'vault'
+        amount: 10.0
+  'buy_3_items':
+    name: 'Kis vásárló!'
+    description: '&7Vásárolj 3 tárgyat egy játék alatt.'
+    triggers: [ 'item_bought' ]
+    criteria:
+      type: 'item_bought'
+      single_match: true
+      operator: '>='
+      material: "any"
+      count: 3
+    rewards:
+      - type: 'vault'
+        amount: 10.0

@@ -3,7 +3,7 @@ General:
 
 Rewards:
   AchievementComplete: "%prefix% &aSikeresen teljesítetted a(z) &e%achievement_name% &akihívást!"
-  AchievementPoint: "%prefix% &aKaptál &7%amount% &akihívás pontot jutalomként!"
+  AchievementPoints: "%prefix% &aKaptál &7%amount% &akihívás pontot jutalomként!"
   Vault:
     Achievement: "%prefix% &aKaptál &7%amount% T &ajutalomként a kihívásért!"
     Quest: "%prefix% &aKaptál &7%amount% T &ajutalomként a küldetésért!"
