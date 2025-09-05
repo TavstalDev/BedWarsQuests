@@ -293,7 +293,7 @@ public class SqlLiteDatabase implements IDatabase {
     public void wipePlayerDailyObjectives() {
         try (Connection connection = CreateConnection())
         {
-            String sql = String.format("TRUNCATE TABLE %s_daily_obj;",
+            String sql = String.format("TRUNCATE %s_daily_obj;",
                     getConfig().getString("storage.tablePrefix"));
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.executeUpdate();
@@ -409,7 +409,7 @@ public class SqlLiteDatabase implements IDatabase {
     public void wipePlayerWeeklyObjectives() {
         try (Connection connection = CreateConnection())
         {
-            String sql = String.format("TRUNCATE TABLE %s_weekly_obj;",
+            String sql = String.format("TRUNCATE %s_weekly_obj;",
                     getConfig().getString("storage.tablePrefix"));
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.executeUpdate();
