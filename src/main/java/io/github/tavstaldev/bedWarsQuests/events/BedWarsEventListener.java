@@ -70,7 +70,8 @@ public class BedWarsEventListener implements Listener {
             var killerStats = PlayerCacheManager.get(killerPlayer.getUniqueId()).getMatchStats();
             killerStats.Kills++;
             killerStats.KillStreak++;
-            if (!event.getGame().getTeamOfPlayer(victimPlayer).isTargetBlockExists()) {
+            var team = event.getGame().getTeamOfPlayer(victimPlayer);
+            if (team != null && !team.isTargetBlockExists()) {
                 killerStats.FinalKills++;
             }
             EventMapping.handleEvent(killerPlayer, event);
