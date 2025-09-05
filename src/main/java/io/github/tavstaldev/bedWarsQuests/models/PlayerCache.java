@@ -150,7 +150,6 @@ public class PlayerCache {
 
         Collections.shuffle(objectives);
         int numToTake = Math.min(3, objectives.size());
-        BedWarsQuests.Logger().Warn("Objective size: " + objectives.size() + ", numToTake: " + numToTake);
         for (var item : objectives.subList(0, numToTake)) {
             BedWarsQuests.Database().addPlayerDailyObjective(_player.getUniqueId(), item.Id);
             addDailyObjective(new DailyObjectiveData(_player.getUniqueId(), item.Id, false));
@@ -186,7 +185,6 @@ public class PlayerCache {
         }
         Collections.shuffle(objectives);
         int numToTake = Math.min(3, objectives.size());
-        BedWarsQuests.Logger().Warn("Objective size: " + objectives.size() + ", numToTake: " + numToTake);
         for (var item : objectives.subList(0, numToTake)) {
             BedWarsQuests.Database().addPlayerWeeklyObjective(_player.getUniqueId(), item.Id);
             addWeeklyObjective(new WeeklyObjectiveData(_player.getUniqueId(), item.Id, false));
