@@ -24,6 +24,10 @@ public class WinCriteria extends AchievementCriteria {
         } else {
             statistic = BedWarsQuests.BedwarsApi().getStatisticsManager().getDailyStatistic(player.getUniqueId());
         }
+        if (statistic == null) {
+            BedWarsQuests.Logger().Warn("Player statistic is null for player: " + player.getName());
+            return false;
+        }
         value = statistic.getWins();
 
         return switch (getOperator()) {
