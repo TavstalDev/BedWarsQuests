@@ -5,14 +5,14 @@ Rewards:
   AchievementComplete: "%prefix% &aSikeresen teljesítetted a(z) &e%achievement_name% &akihívást!"
   AchievementPoints: "%prefix% &aKaptál &7%amount% &akihívás pontot jutalomként!"
   Vault:
-    Achievement: "%prefix% &aKaptál &7%amount% T &ajutalomként a kihívásért!"
-    Quest: "%prefix% &aKaptál &7%amount% T &ajutalomként a küldetésért!"
+    Achievement: "%prefix% &aKaptál &7%amount% T &ajutalomként a(z) &e%name%&a kihívásért!"
+    Quest: "%prefix% &aKaptál &7%amount% T &ajutalomként a(z) &e%name%&a küldetésért!"
   Experience:
-    Achievement: "%prefix% &aKaptál &b%amount% XP-t &ajutalomként a kihívásért!"
-    Quest: "%prefix% &aKaptál &b%amount% XP-t &ajutalomként a küldetésért!"
+    Achievement: "%prefix% &aKaptál &b%amount% XP-t &ajutalomként a(z) &e%name%&a kihívásért!"
+    Quest: "%prefix% &aKaptál &b%amount% XP-t &ajutalomként a(z) &e%name%&a küldetésért!"
   Coins:
-    Achievement: "%prefix% &aKaptál &6%amount% BÉ-t &ajutalomként a kihívásért!"
-    Quest: "%prefix% &aKaptál &6%amount% BÉ-t &ajutalomként a küldetésért!"
+    Achievement: "%prefix% &aKaptál &6%amount% BÉ-t &ajutalomként a(z) &e%name%&a kihívásért!"
+    Quest: "%prefix% &aKaptál &6%amount% BÉ-t &ajutalomként a(z) &e%name%&a küldetésért!"
   Command: "%prefix% &aJutalmad végrehajtva."
 
 Commands:
