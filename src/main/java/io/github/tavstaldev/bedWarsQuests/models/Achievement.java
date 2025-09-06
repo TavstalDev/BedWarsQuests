@@ -41,7 +41,7 @@ public class Achievement {
         }
 
         for (RewardAction reward : Rewards) {
-            reward.grant(player, kind == ECompletionKind.Achievement);
+            reward.grant(player, Name, kind == ECompletionKind.Achievement);
         }
     }
 }

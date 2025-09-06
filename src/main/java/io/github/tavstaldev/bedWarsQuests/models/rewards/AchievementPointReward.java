@@ -15,9 +15,9 @@ public class AchievementPointReward extends RewardAction {
     }
 
     @Override
-    public void grant(Player player, boolean isAchievement) {
+    public void grant(Player player, String name, boolean isAchievement) {
         BedWarsQuests.Database().increaseAchievementPoints(player.getUniqueId(), points);
-        BedWarsQuests.Instance.sendLocalizedMsg(player, "Rewards.AchievementPoints", Map.of("amount", String.valueOf(points)));
+        BedWarsQuests.Instance.sendLocalizedMsg(player, "Rewards.AchievementPoints", Map.of("name", name,"amount", String.valueOf(points)));
     }
 
     @Override

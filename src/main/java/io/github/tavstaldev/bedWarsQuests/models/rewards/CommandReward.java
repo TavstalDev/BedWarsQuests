@@ -18,7 +18,7 @@ public class CommandReward extends RewardAction {
     }
 
     @Override
-    public void grant(Player player, boolean isAchievement) {
+    public void grant(Player player, String name, boolean isAchievement) {
         String cmd = command.replace("%player%", player.getName());
         if (asConsole) {
             Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), cmd);

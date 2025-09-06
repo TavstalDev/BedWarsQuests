@@ -15,12 +15,12 @@ public class CoinsReward extends RewardAction {
     }
 
     @Override
-    public void grant(Player player, boolean isAchievement) {
+    public void grant(Player player, String Name, boolean isAchievement) {
         BedWarsQuests.BanyaszApi().increaseBalance(player.getUniqueId(), coins);
         if (isAchievement)
-            BedWarsQuests.Instance.sendLocalizedMsg(player, "Rewards.Coins.Achievement", Map.of("amount", String.valueOf(coins)));
+            BedWarsQuests.Instance.sendLocalizedMsg(player, "Rewards.Coins.Achievement", Map.of("name", Name, "amount", String.valueOf(coins)));
         else
-            BedWarsQuests.Instance.sendLocalizedMsg(player, "Rewards.Coins.Quest", Map.of("amount", String.valueOf(coins)));
+            BedWarsQuests.Instance.sendLocalizedMsg(player, "Rewards.Coins.Quest", Map.of("name", Name,"amount", String.valueOf(coins)));
     }
 
     @Override
