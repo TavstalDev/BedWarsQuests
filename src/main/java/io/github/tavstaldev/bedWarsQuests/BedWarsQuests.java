@@ -164,16 +164,18 @@ public class BedWarsQuests extends PluginBase {
         this.getServer().getScheduler().scheduleSyncRepeatingTask(this, task, 20L * 30, 20L * 900);
 
         _logger.Ok(String.format("%s has been successfully loaded.", getProjectName()));
-        isUpToDate().thenAccept(upToDate -> {
-            if (upToDate) {
-                _logger.Ok("Plugin is up to date!");
-            } else {
-                _logger.Warn("A new version of the plugin is available: " + getDownloadUrl());
-            }
-        }).exceptionally(e -> {
-            _logger.Error("Failed to determine update status: " + e.getMessage());
-            return null;
-        });
+        if (getConfig().getBoolean("checkForUpdates", true)) {
+            isUpToDate().thenAccept(upToDate -> {
+                if (upToDate) {
+                    _logger.Ok("Plugin is up to date!");
+                } else {
+                    _logger.Warn("A new version of the plugin is available: " + getDownloadUrl());
+                }
+            }).exceptionally(e -> {
+                _logger.Error("Failed to determine update status: " + e.getMessage());
+                return null;
+            });
+        }
     }
 
     @Override

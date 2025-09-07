@@ -17,7 +17,7 @@ public class BWQConfiguration extends ConfigurationBase {
         // General
         resolve("locale", "hun");
         resolve("usePlayerLocale", true);
-        resolve("updateChecker", true);
+        resolve("checkForUpdates", true);
         resolve("debug", false);
         resolve("prefix", "&cBedWars&fQuests &8»");
 
