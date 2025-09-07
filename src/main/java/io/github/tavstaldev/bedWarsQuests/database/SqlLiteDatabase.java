@@ -137,6 +137,22 @@ public class SqlLiteDatabase implements IDatabase {
     }
 
     @Override
+    public void wipePlayerData() {
+        try (Connection connection = CreateConnection())
+        {
+            String sql = String.format("TRUNCATE %s_playerData;",
+                    getConfig().getString("storage.tablePrefix"));
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.executeUpdate();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(String.format("Unknown error happened while wiping playerData...\n%s", ex.getMessage()));
+        }
+    }
+
+    @Override
     public void increaseAchievementPoints(UUID playerId, long points) {
         try (Connection connection = CreateConnection())
         {
@@ -472,6 +488,22 @@ public class SqlLiteDatabase implements IDatabase {
         catch (Exception ex)
         {
             _logger.Error(String.format("Unknown error happened while adding completedAchievement...\n%s", ex.getMessage()));
+        }
+    }
+
+    @Override
+    public void wipeCompletedAchievements() {
+        try (Connection connection = CreateConnection())
+        {
+            String sql = String.format("TRUNCATE %s_comp_achievements;",
+                    getConfig().getString("storage.tablePrefix"));
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.executeUpdate();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(String.format("Unknown error happened while wiping completedAchievementData...\n%s", ex.getMessage()));
         }
     }
 

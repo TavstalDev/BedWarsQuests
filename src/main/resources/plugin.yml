@@ -27,12 +27,18 @@ commands:
         description: "Reload the plugin"
         usage: "/bedwarsquests reload"
         permission: bedwarsquests.commands.reload
+      reset:
+        description: "Reset the player's quests and achievements"
+        usage: "/bedwarsquests reset"
+        permission: bedwarsquests.commands.reset
       open:
         description: "Open the BedWars quest GUI"
         usage: "/bedwarsquests open"
         permission: bedwarsquests.commands.gui
 permissions:
   bedwarsquests.commands.reload:
+    default: op
+  bedwarsquests.commands.reset:
     default: op
   bedwarsquests.commands.version:
     default: op
@@ -53,6 +59,7 @@ permissions:
     children:
       bedwarsquests.commands.reload: true
       bedwarsquests.commands.version: true
+      bedwarsquests.commands.reset: true
   bedwarsquests.*:
     description: Gives all permissions related to the bedwarsquests plugin.
     default: op

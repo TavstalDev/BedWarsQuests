@@ -2,6 +2,8 @@ package io.github.tavstaldev.bedWarsQuests.commands;
 
 import io.github.tavstaldev.bedWarsQuests.BedWarsQuests;
 import io.github.tavstaldev.bedWarsQuests.gui.MainGUI;
+import io.github.tavstaldev.bedWarsQuests.managers.PlayerCacheManager;
+import io.github.tavstaldev.bedWarsQuests.models.PlayerCache;
 import io.github.tavstaldev.minecorelib.core.PluginLogger;
 import io.github.tavstaldev.minecorelib.models.command.SubCommandData;
 import io.github.tavstaldev.minecorelib.utils.ChatUtils;
@@ -38,6 +40,11 @@ public class CommandGUI implements CommandExecutor {
             add(new SubCommandData("reload", "bedwarsquests.commands.reload", Map.of(
                "syntax", "",
                "description", "Commands.Reload.Desc"
+            )));
+            // RESET
+            add(new SubCommandData("reset", "bedwarsquests.commands.reset", Map.of(
+                "syntax", "<player|all>",
+                "description", "Commands.Reset.Desc"
             )));
             // OPEN
             add(new SubCommandData("", "bedwarsquests.commands.gui", Map.of(
@@ -101,6 +108,36 @@ public class CommandGUI implements CommandExecutor {
 
                     BedWarsQuests.Instance.reload();
                     BedWarsQuests.Instance.sendLocalizedMsg(player, "Commands.Reload.Done");
+                    return true;
+                }
+                case "reset": {
+                    if (!player.hasPermission("bedwarsquests.commands.reset")) {
+                        BedWarsQuests.Instance.sendLocalizedMsg(player, "General.NoPermission");
+                        return true;
+                    }
+
+                    if (args.length < 2) {
+                        BedWarsQuests.Instance.sendLocalizedMsg(player, "Commands.Reset.Confirmation");
+                        return true;
+                    }
+
+                    if (!args[1].equalsIgnoreCase("confirm")) {
+
+                        BedWarsQuests.Instance.sendLocalizedMsg(player, "Commands.Reset.Confirmation");
+                        return true;
+                    }
+
+                    BedWarsQuests.Database().wipeCompletedAchievements();
+                    BedWarsQuests.Database().wipePlayerDailyObjectives();
+                    BedWarsQuests.Database().wipePlayerWeeklyObjectives();
+                    BedWarsQuests.Database().wipePlayerData();
+
+                    for (Player onlinePlayer : BedWarsQuests.Instance.getServer().getOnlinePlayers()) {
+                        PlayerCache playerData = new PlayerCache(onlinePlayer);
+                        PlayerCacheManager.add(onlinePlayer.getUniqueId(), playerData);
+                    }
+
+                    BedWarsQuests.Instance.sendLocalizedMsg(player, "Commands.Reset.Done");
                     return true;
                 }
             }

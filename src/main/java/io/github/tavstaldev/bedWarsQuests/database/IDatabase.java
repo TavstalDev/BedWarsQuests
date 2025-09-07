@@ -28,6 +28,8 @@ public interface IDatabase {
 
     void increaseCompletedWeeklyObjectives(UUID playerId);
 
+    void wipePlayerData();
+
     @Nullable PlayerData getPlayerData(UUID playerId);
     //#endregion
 
@@ -59,6 +61,8 @@ public interface IDatabase {
     void addCompletedAchievement(UUID playerId, String achievementId);
 
     boolean hasPlayerCompletedAchievement(UUID playerId, String achievementId);
+
+    void wipeCompletedAchievements();
 
     List<CompletedAchievementData> getPlayerCompletedAchievements(UUID playerId);
     //#endregion

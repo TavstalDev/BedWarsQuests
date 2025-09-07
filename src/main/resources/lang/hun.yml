@@ -37,6 +37,10 @@ Commands:
   Reload:
     Desc: "Újratölti a plugin konfigurációját és üzeneteit."
     Done: "%prefix% &aA plugin frissítve."
+  Reset:
+    Desc: "Visszaállítja a játékos küldetéseit és kihívásait."
+    Confirmation: "%prefix% &cBiztosan vissza akarod állítani a küldetéseket és kihívásokat? &e/bwgui reset confirm &c-vel erősítheted meg."
+    Done: "%prefix% &aSikeresen visszaállítottad a plugin adataidat."
   Gui:
     Desc: "Megnyitja a GUI-t."
 
