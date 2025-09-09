@@ -189,7 +189,7 @@ public class BedWarsQuests extends PluginBase {
         _translator.Load();
         _logger.Debug("Localizations reloaded.");
         _logger.Debug("Reloading configuration...");
-        this.reloadConfig();
+        _config.load();
         _logger.Debug("Configuration reloaded.");
     }
 }
