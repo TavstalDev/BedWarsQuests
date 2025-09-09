@@ -26,18 +26,4 @@ public class IconUtils {
         }
         return material;
     }
-
-    /**
-     * Retrieves a Material based on a configuration key. The key is used to
-     * fetch the material name from the configuration, and the material is
-     * resolved using the {@link #getMaterial(String)} method.
-     *
-     * @param configKey The key in the configuration to fetch the material name.
-     * @return The corresponding Material, or STONE if the key is invalid or
-     *         the material name is not found.
-     */
-    public static Material getMaterialFromConfig(String configKey) {
-        String materialName = BedWarsQuests.Config().getString(configKey);
-        return getMaterial(materialName);
-    }
 }
