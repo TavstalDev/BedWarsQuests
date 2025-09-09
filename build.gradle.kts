@@ -66,8 +66,6 @@ dependencies {
 
     // HikariCP for database connection pooling
     implementation("com.zaxxer:HikariCP:${hikariCpVersion}")
-    // YAML parsing library
-    //implementation("org.yaml:snakeyaml:${snakeYamlVersion}")
     // SpiGUI for GUI creation
     implementation("com.samjakob:SpiGUI:${spiGuiVersion}")
     // Custom library for core functionality
@@ -86,9 +84,7 @@ tasks.shadowJar {
         attributes["paperweight-mappings-namespace"] = "spigot" // Add custom manifest attributes
     }
     // Relocate packages to avoid conflicts
-    //relocate("org.yaml", "${projectPackageName}.shadow.snakeyaml")
     relocate("com.samjakob.spigui", "${projectPackageName}.shadow.spigui")
-    relocate("org.slf4j", "${projectPackageName}.shadow.slf4j")
 }
 
 // Ensure the Shadow JAR task runs during the build process
