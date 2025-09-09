@@ -38,8 +38,8 @@ public class BedWarsQuests extends PluginBase {
         return Instance.getTranslator();
     }
 
-    public static FileConfiguration Config() {
-        return Instance.getConfig();
+    public static BWQConfiguration Config() {
+        return (BWQConfiguration) Instance.getConfig();
     }
 
     public static SpiGUI GUI() {
@@ -126,7 +126,7 @@ public class BedWarsQuests extends PluginBase {
         }
 
         // Initialize database based on configuration
-        String databaseType = this.getConfig().getString("storage.type");
+        String databaseType = Config().storageType;
         if (databaseType == null) {
             databaseType = "sqlite";
         }
@@ -164,7 +164,7 @@ public class BedWarsQuests extends PluginBase {
         this.getServer().getScheduler().scheduleSyncRepeatingTask(this, task, 20L * 30, 20L * 900);
 
         _logger.Ok(String.format("%s has been successfully loaded.", getProjectName()));
-        if (getConfig().getBoolean("checkForUpdates", true)) {
+        if (Config().checkForUpdates) {
             isUpToDate().thenAccept(upToDate -> {
                 if (upToDate) {
                     _logger.Ok("Plugin is up to date!");

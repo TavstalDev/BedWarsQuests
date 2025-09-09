@@ -2,6 +2,7 @@ package io.github.tavstaldev.bedWarsQuests.gui;
 
 import com.samjakob.spigui.buttons.SGButton;
 import com.samjakob.spigui.menu.SGMenu;
+import io.github.tavstaldev.bedWarsQuests.BWQConfiguration;
 import io.github.tavstaldev.bedWarsQuests.BedWarsQuests;
 import io.github.tavstaldev.bedWarsQuests.managers.PlayerCacheManager;
 import io.github.tavstaldev.bedWarsQuests.models.database.DailyObjectiveData;
@@ -30,17 +31,16 @@ public class MainGUI {
         try {
             SGMenu menu = BedWarsQuests.GUI().create(_translator.Localize(player, "GUI.Main.Title"), Rows);
             var playerId = player.getUniqueId();
+            BWQConfiguration config = BedWarsQuests.Config();
 
             // Create Placeholders
-            Material placeholderMaterial = IconUtils.getMaterialFromConfig("gui.placeholderItem");
-            SGButton placeholderButton = new SGButton(GuiUtils.createItem(BedWarsQuests.Instance, placeholderMaterial, " "));
+            SGButton placeholderButton = new SGButton(GuiUtils.createItem(BedWarsQuests.Instance, config.guiPlaceholderItem, " "));
             int slots = Rows * 9;
             for (int i = 0; i < slots; i++) {
                 menu.setButton(0, i, placeholderButton);
             }
 
             // Title Button
-            Material titleMaterial = IconUtils.getMaterialFromConfig("gui.titleItem");
             List<Component> titleLore = new ArrayList<>();
             var rawRole = _translator.LocalizeList(player, "GUI.Main.Lore");
             for (String line : rawRole) {
@@ -48,22 +48,20 @@ public class MainGUI {
             }
 
             SGButton titleButton = new SGButton(
-                    GuiUtils.createItem(BedWarsQuests.Instance, titleMaterial, _translator.Localize(player, "GUI.Main.Item"), titleLore)
+                    GuiUtils.createItem(BedWarsQuests.Instance, config.guiTitleItem, _translator.Localize(player, "GUI.Main.Item"), titleLore)
             );
             menu.setButton(0, 4, titleButton);
 
             // Close Button
-            Material closeMaterial = IconUtils.getMaterialFromConfig("gui.closeItem");
             SGButton closeButton = new SGButton(
-                    GuiUtils.createItem(BedWarsQuests.Instance, closeMaterial, _translator.Localize(player, "GUI.Close"))
+                    GuiUtils.createItem(BedWarsQuests.Instance, config.guiCloseItem, _translator.Localize(player, "GUI.Close"))
             ).withListener(event -> close(player));
             menu.setButton(0, 18, closeButton);
 
 
             // Achievement Button
-            Material achievementMaterial = IconUtils.getMaterialFromConfig("gui.achievementItem");
             SGButton achievementButton = new SGButton(
-                    GuiUtils.createItem(BedWarsQuests.Instance, achievementMaterial, _translator.Localize(player, "GUI.Achievements.Item"))
+                    GuiUtils.createItem(BedWarsQuests.Instance, config.guiAchievementItem, _translator.Localize(player, "GUI.Achievements.Item"))
             ).withListener(event -> {
                 var data = PlayerCacheManager.get(playerId);
                 close(player);
@@ -99,6 +97,7 @@ public class MainGUI {
             var playerId = player.getUniqueId();
             var playerCache = PlayerCacheManager.get(playerId);
             var menu = playerCache.getMainMenu();
+            BWQConfiguration config = BedWarsQuests.Config();
 
             // Daily Quests
             for (int i = 0; i < 3; i++) {
@@ -119,9 +118,9 @@ public class MainGUI {
 
                 Material questMaterial;
                 if (dailyObjectiveData.IsCompleted)
-                    questMaterial = IconUtils.getMaterialFromConfig("gui.completedDailyQuestItem");
+                    questMaterial = config.guiCompletedDailyQuestItem;
                 else
-                    questMaterial = IconUtils.getMaterialFromConfig("gui.dailyQuestItem");
+                    questMaterial = config.guiDailyQuestItem;
 
                 var objective = BedWarsQuests.ObjectiveManager().getObjectiveById(dailyObjectiveData.ObjectiveId);
                 if (objective == null) {
@@ -179,9 +178,9 @@ public class MainGUI {
 
                 Material questMaterial;
                 if (weeklyObjectiveData.IsCompleted)
-                    questMaterial = IconUtils.getMaterialFromConfig("gui.completedWeeklyQuestItem");
+                    questMaterial = config.guiCompletedWeeklyQuestItem;
                 else
-                    questMaterial = IconUtils.getMaterialFromConfig("gui.weeklyQuestItem");
+                    questMaterial = config.guiWeeklyQuestItem;
 
                 var objective = BedWarsQuests.ObjectiveManager().getObjectiveById(weeklyObjectiveData.ObjectiveId);
                 if (objective == null) {

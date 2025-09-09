@@ -2,6 +2,7 @@ package io.github.tavstaldev.bedWarsQuests.gui;
 
 import com.samjakob.spigui.buttons.SGButton;
 import com.samjakob.spigui.menu.SGMenu;
+import io.github.tavstaldev.bedWarsQuests.BWQConfiguration;
 import io.github.tavstaldev.bedWarsQuests.BedWarsQuests;
 import io.github.tavstaldev.bedWarsQuests.managers.PlayerCacheManager;
 import io.github.tavstaldev.bedWarsQuests.utils.IconUtils;
@@ -27,18 +28,16 @@ public class AchievementGUI {
     public static SGMenu create(@NotNull Player player) {
         try {
             SGMenu menu = BedWarsQuests.GUI().create(_translator.Localize(player, "GUI.Achievements.Title"), Rows);
-            var playerId = player.getUniqueId();
+            BWQConfiguration config = BedWarsQuests.Config();
 
             // Create Placeholders
-            Material placeholderMaterial = IconUtils.getMaterialFromConfig("gui.placeholderItem");
-            SGButton placeholderButton = new SGButton(GuiUtils.createItem(BedWarsQuests.Instance, placeholderMaterial, " "));
+            SGButton placeholderButton = new SGButton(GuiUtils.createItem(BedWarsQuests.Instance, config.guiPlaceholderItem, " "));
             int slots = Rows * 9;
             for (int i = 0; i < slots; i++) {
                 menu.setButton(0, i, placeholderButton);
             }
 
             // Title Button
-            Material titleMaterial = IconUtils.getMaterialFromConfig("gui.achievementItem");
             List<Component> titleLore = new ArrayList<>();
             var rawRole = _translator.LocalizeList(player, "GUI.Achievements.Lore");
             for (String line : rawRole) {
@@ -46,14 +45,13 @@ public class AchievementGUI {
             }
 
             SGButton titleButton = new SGButton(
-                    GuiUtils.createItem(BedWarsQuests.Instance, titleMaterial, _translator.Localize(player, "GUI.Achievements.Item"), titleLore)
+                    GuiUtils.createItem(BedWarsQuests.Instance, config.guiAchievementItem, _translator.Localize(player, "GUI.Achievements.Item"), titleLore)
             );
             menu.setButton(0, 4, titleButton);
 
             // Back Button
-            Material backMaterial = IconUtils.getMaterialFromConfig("gui.backItem");
             SGButton backButton = new SGButton(
-                    GuiUtils.createItem(BedWarsQuests.Instance, backMaterial, _translator.Localize(player, "GUI.Back"))
+                    GuiUtils.createItem(BedWarsQuests.Instance, config.guiBackItem, _translator.Localize(player, "GUI.Back"))
             ).withListener(event -> {
                 close(player);
                 MainGUI.open(player);
@@ -87,6 +85,7 @@ public class AchievementGUI {
             var playerId = player.getUniqueId();
             var playerCache = PlayerCacheManager.get(playerId);
             var menu = playerCache.getAchievementMenu();
+            BWQConfiguration config = BedWarsQuests.Config();
 
             var achievements = BedWarsQuests.AchievementManager().getAchievements();
             int page = playerCache.getAchievementPage();
@@ -95,9 +94,9 @@ public class AchievementGUI {
 
             //#region Previous Page Button
             Material prevMaterial = hasPrevious ?
-                    IconUtils.getMaterialFromConfig("gui.previousPageItem")
+                    config.guiPreviousPageItem
                     :
-                    IconUtils.getMaterialFromConfig("gui.noPreviousPageItem");
+                    config.guiNoPreviousPageItem;
             String prevName = hasPrevious ? _translator.Localize(player, "GUI.PreviousPage") : " ";
             SGButton prevPageButton = new SGButton(
                     GuiUtils.createItem(BedWarsQuests.Instance, prevMaterial, prevName )
@@ -112,9 +111,8 @@ public class AchievementGUI {
             //#endregion
 
             //#region Page Indicator
-            Material pageMaterial = IconUtils.getMaterialFromConfig("gui.currentPageItem");
             SGButton pageButton = new SGButton(
-                    GuiUtils.createItem(BedWarsQuests.Instance, pageMaterial, _translator.Localize(player, "GUI.Page", Map.of(
+                    GuiUtils.createItem(BedWarsQuests.Instance, config.guiCurrentPageItem, _translator.Localize(player, "GUI.Page", Map.of(
                             "page", String.valueOf(page)))
                     )
             );
@@ -123,9 +121,9 @@ public class AchievementGUI {
 
             //#region Next Page Button
             Material nextMaterial = hasNext ?
-                    IconUtils.getMaterialFromConfig("gui.nextPageItem")
+                    config.guiNextPageItem
                     :
-                    IconUtils.getMaterialFromConfig("gui.noNextPageItem");
+                    config.guiNoNextPageItem;
             String nextName = hasNext ? _translator.Localize(player, "GUI.NextPage") : " ";
             SGButton nextPageButton = new SGButton(GuiUtils.createItem(BedWarsQuests.Instance, nextMaterial,nextName)
             ).withListener(event -> {
@@ -139,8 +137,6 @@ public class AchievementGUI {
             menu.setButton(0, 50, nextPageButton);
             //#endregion
 
-            Material lockedAchievement = IconUtils.getMaterialFromConfig("gui.lockedAchievementItem");
-            Material completedAchievement = IconUtils.getMaterialFromConfig("gui.completedAchievementItem");
             for (int i = 0; i < ItemsPerPage; i++) {
                 int index = i + (page - 1) * ItemsPerPage;
                 int slot = i + 10 + (2 * (i / 7));
@@ -151,7 +147,7 @@ public class AchievementGUI {
 
                 var achievement = achievements.get(index);
                 boolean isCompleted = playerCache.isAchievementCompleted(achievement.Id);
-                Material material = isCompleted ? completedAchievement : lockedAchievement;
+                Material material = isCompleted ? config.guiCompletedAchievementItem : config.guiLockedAchievementItem;
 
                 String displayName = BedWarsQuests.Translator().Localize(player, isCompleted ? "GUI.AchievementData.UnlockedName" : "GUI.AchievementData.LockedName", Map.of("achievement_name", achievement.Name));
                 String status = BedWarsQuests.Translator().Localize(player, isCompleted ? "GUI.AchievementData.UnlockedStatus" : "GUI.AchievementData.LockedStatus");

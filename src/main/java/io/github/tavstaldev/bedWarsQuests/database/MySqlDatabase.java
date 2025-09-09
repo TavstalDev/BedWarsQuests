@@ -2,13 +2,13 @@ package io.github.tavstaldev.bedWarsQuests.database;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import io.github.tavstaldev.bedWarsQuests.BWQConfiguration;
 import io.github.tavstaldev.bedWarsQuests.BedWarsQuests;
 import io.github.tavstaldev.bedWarsQuests.models.database.CompletedAchievementData;
 import io.github.tavstaldev.bedWarsQuests.models.database.DailyObjectiveData;
 import io.github.tavstaldev.bedWarsQuests.models.database.PlayerData;
 import io.github.tavstaldev.bedWarsQuests.models.database.WeeklyObjectiveData;
 import io.github.tavstaldev.minecorelib.core.PluginLogger;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.Connection;
@@ -19,12 +19,13 @@ import java.util.List;
 import java.util.UUID;
 
 public class MySqlDatabase implements IDatabase {
-    private static HikariDataSource _dataSource;
-    private static FileConfiguration getConfig() { return BedWarsQuests.Instance.getConfig(); }
-    private static final PluginLogger _logger = BedWarsQuests.Logger().WithModule(MySqlDatabase.class);
+    private HikariDataSource _dataSource;
+    private BWQConfiguration _config;
+    private final PluginLogger _logger = BedWarsQuests.Logger().WithModule(MySqlDatabase.class);
 
     @Override
     public void load() {
+        _config = BedWarsQuests.Config();
         _dataSource = CreateDataSource();
     }
 
@@ -40,9 +41,9 @@ public class MySqlDatabase implements IDatabase {
         try
         {
             HikariConfig config = new HikariConfig();
-            config.setJdbcUrl(String.format("jdbc:mysql://%s:%s/%s", getConfig().getString("storage.host"), getConfig().getString("storage.port"), getConfig().getString("storage.database"))); // Address of your running MySQL database
-            config.setUsername(getConfig().getString("storage.username")); // Username
-            config.setPassword(getConfig().getString("storage.password")); // Password
+            config.setJdbcUrl(String.format("jdbc:mysql://%s:%s/%s", _config.storageHost,_config.storagePort, _config.storageDatabase));
+            config.setUsername(_config.storageUsername);
+            config.setPassword(_config.storagePassword);
             config.setMaximumPoolSize(10); // Pool size defaults to 10
             config.setMaxLifetime(30000);
             return new HikariDataSource(config);
@@ -64,7 +65,7 @@ public class MySqlDatabase implements IDatabase {
                     "AchievementPoints BIGINT, " +
                     "CompletedDailyObjectives INT(11), " +
                     "CompletedWeeklyObjectives INT(11));",
-                    getConfig().getString("storage.tablePrefix")
+                    _config.storageTablePrefix
             );
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.executeUpdate();
@@ -73,7 +74,7 @@ public class MySqlDatabase implements IDatabase {
             sql = String.format("CREATE TABLE IF NOT EXISTS %s_comp_achievements (" +
                             "PlayerId VARCHAR(36), " +
                             "AchievementId VARCHAR(64));",
-                    getConfig().getString("storage.tablePrefix")
+                    _config.storageTablePrefix
             );
             statement = connection.prepareStatement(sql);
             statement.executeUpdate();
@@ -83,7 +84,7 @@ public class MySqlDatabase implements IDatabase {
                             "PlayerId VARCHAR(36), " +
                             "ObjectiveId VARCHAR(64), " +
                             "IsCompleted BOOLEAN);",
-                    getConfig().getString("storage.tablePrefix")
+                    _config.storageTablePrefix
             );
             statement = connection.prepareStatement(sql);
             statement.executeUpdate();
@@ -93,7 +94,7 @@ public class MySqlDatabase implements IDatabase {
                             "PlayerId VARCHAR(36), " +
                             "ObjectiveId VARCHAR(64), " +
                             "IsCompleted BOOLEAN);",
-                    getConfig().getString("storage.tablePrefix")
+                    _config.storageTablePrefix
             );
             statement = connection.prepareStatement(sql);
             statement.executeUpdate();
@@ -111,7 +112,7 @@ public class MySqlDatabase implements IDatabase {
         {
             String sql = String.format("INSERT INTO %s_playerData (PlayerId, AchievementPoints, CompletedDailyObjectives, CompletedWeeklyObjectives) " +
                             "VALUES (?, ?, ?, ?);",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
 
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 // Set parameters for the prepared statement
@@ -135,7 +136,7 @@ public class MySqlDatabase implements IDatabase {
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("UPDATE %s_playerData SET AchievementPoints=?, CompletedDailyObjectives=?, CompletedWeeklyObjectives=? WHERE PlayerId=?;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setLong(1, achievementPoints);
                 statement.setInt(2, completedDailyObjectives);
@@ -155,7 +156,7 @@ public class MySqlDatabase implements IDatabase {
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("TRUNCATE %s_playerData;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.executeUpdate();
             }
@@ -171,7 +172,7 @@ public class MySqlDatabase implements IDatabase {
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("UPDATE %s_playerData SET AchievementPoints=AchievementPoints+? WHERE PlayerId=?;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setLong(1, points);
                 statement.setString(2, playerId.toString());
@@ -189,7 +190,7 @@ public class MySqlDatabase implements IDatabase {
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("UPDATE %s_playerData SET CompletedDailyObjectives=CompletedDailyObjectives+1 WHERE PlayerId=?;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, playerId.toString());
                 statement.executeUpdate();
@@ -206,7 +207,7 @@ public class MySqlDatabase implements IDatabase {
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("UPDATE %s_playerData SET CompletedWeeklyObjectives=CompletedWeeklyObjectives+1 WHERE PlayerId=?;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, playerId.toString());
                 statement.executeUpdate();
@@ -224,7 +225,7 @@ public class MySqlDatabase implements IDatabase {
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("SELECT * FROM %s_playerData WHERE PlayerId=? LIMIT 1;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, playerId.toString());
                 try (ResultSet result = statement.executeQuery()) {
@@ -256,7 +257,7 @@ public class MySqlDatabase implements IDatabase {
         {
             String sql = String.format("INSERT INTO %s_daily_obj (PlayerId, ObjectiveId, IsCompleted) " +
                             "VALUES (?, ?, ?);",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
 
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 // Set parameters for the prepared statement
@@ -279,7 +280,7 @@ public class MySqlDatabase implements IDatabase {
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("UPDATE %s_daily_obj SET IsCompleted=? WHERE PlayerId=? AND ObjectiveId=?;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setBoolean(1, isCompleted);
                 statement.setString(2, playerId.toString());
@@ -299,7 +300,7 @@ public class MySqlDatabase implements IDatabase {
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("SELECT * FROM %s_daily_obj WHERE PlayerId=? AND ObjectiveId=? LIMIT 1;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, playerId.toString());
                 statement.setString(2, objectiveId);
@@ -324,7 +325,7 @@ public class MySqlDatabase implements IDatabase {
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("TRUNCATE %s_daily_obj;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.executeUpdate();
             }
@@ -341,7 +342,7 @@ public class MySqlDatabase implements IDatabase {
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("SELECT * FROM %s_daily_obj WHERE PlayerId=?;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, playerId.toString());
                 try (ResultSet result = statement.executeQuery()) {
@@ -372,7 +373,7 @@ public class MySqlDatabase implements IDatabase {
         {
             String sql = String.format("INSERT INTO %s_weekly_obj (PlayerId, ObjectiveId, IsCompleted) " +
                             "VALUES (?, ?, ?);",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
 
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 // Set parameters for the prepared statement
@@ -395,7 +396,7 @@ public class MySqlDatabase implements IDatabase {
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("UPDATE %s_weekly_obj SET IsCompleted=? WHERE PlayerId=? AND ObjectiveId=?;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setBoolean(1, isCompleted);
                 statement.setString(2, playerId.toString());
@@ -415,7 +416,7 @@ public class MySqlDatabase implements IDatabase {
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("SELECT * FROM %s_weekly_obj WHERE PlayerId=? AND ObjectiveId=? LIMIT 1;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, playerId.toString());
                 statement.setString(2, objectiveId);
@@ -440,7 +441,7 @@ public class MySqlDatabase implements IDatabase {
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("TRUNCATE %s_weekly_obj;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.executeUpdate();
             }
@@ -457,7 +458,7 @@ public class MySqlDatabase implements IDatabase {
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("SELECT * FROM %s_weekly_obj WHERE PlayerId=?;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, playerId.toString());
                 try (ResultSet result = statement.executeQuery()) {
@@ -488,7 +489,7 @@ public class MySqlDatabase implements IDatabase {
         {
             String sql = String.format("INSERT INTO %s_comp_achievements (PlayerId, AchievementId) " +
                             "VALUES (?, ?);",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
 
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 // Set parameters for the prepared statement
@@ -510,7 +511,7 @@ public class MySqlDatabase implements IDatabase {
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("TRUNCATE %s_comp_achievements;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.executeUpdate();
             }
@@ -527,7 +528,7 @@ public class MySqlDatabase implements IDatabase {
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("SELECT * FROM %s_comp_achievements WHERE PlayerId=? AND AchievementId=? LIMIT 1;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, playerId.toString());
                 statement.setString(2, achievementId);
@@ -554,7 +555,7 @@ public class MySqlDatabase implements IDatabase {
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("SELECT * FROM %s_comp_achievements WHERE PlayerId=?;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, playerId.toString());
                 try (ResultSet result = statement.executeQuery()) {

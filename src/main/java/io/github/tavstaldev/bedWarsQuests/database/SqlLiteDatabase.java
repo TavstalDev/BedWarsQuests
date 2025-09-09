@@ -1,5 +1,6 @@
 package io.github.tavstaldev.bedWarsQuests.database;
 
+import io.github.tavstaldev.bedWarsQuests.BWQConfiguration;
 import io.github.tavstaldev.bedWarsQuests.BedWarsQuests;
 import io.github.tavstaldev.bedWarsQuests.models.database.CompletedAchievementData;
 import io.github.tavstaldev.bedWarsQuests.models.database.DailyObjectiveData;
@@ -18,11 +19,13 @@ import java.util.List;
 import java.util.UUID;
 
 public class SqlLiteDatabase implements IDatabase {
-    private static FileConfiguration getConfig() { return BedWarsQuests.Instance.getConfig(); }
-    private static final PluginLogger _logger = BedWarsQuests.Logger().WithModule(SqlLiteDatabase.class);
+    private BWQConfiguration _config;
+    private final PluginLogger _logger = BedWarsQuests.Logger().WithModule(SqlLiteDatabase.class);
 
     @Override
-    public void load() {}
+    public void load() {
+        _config = BedWarsQuests.Config();
+    }
 
     @Override
     public void unload() {}
@@ -31,7 +34,7 @@ public class SqlLiteDatabase implements IDatabase {
         try
         {
             Class.forName("org.sqlite.JDBC");
-            return DriverManager.getConnection(String.format("jdbc:sqlite:plugins/BedWarsQuests/%s.db", getConfig().getString("storage.filename")));
+            return DriverManager.getConnection(String.format("jdbc:sqlite:plugins/BedWarsQuests/%s.db", _config.storageFilename));
         }
         catch (Exception ex)
         {
@@ -50,7 +53,7 @@ public class SqlLiteDatabase implements IDatabase {
                             "AchievementPoints BIGINT, " +
                             "CompletedDailyObjectives INT(11), " +
                             "CompletedWeeklyObjectives INT(11));",
-                    getConfig().getString("storage.tablePrefix")
+                    _config.storageTablePrefix
             );
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.executeUpdate();
@@ -59,7 +62,7 @@ public class SqlLiteDatabase implements IDatabase {
             sql = String.format("CREATE TABLE IF NOT EXISTS %s_comp_achievements (" +
                             "PlayerId VARCHAR(36), " +
                             "AchievementId VARCHAR(64));",
-                    getConfig().getString("storage.tablePrefix")
+                    _config.storageTablePrefix
             );
             statement = connection.prepareStatement(sql);
             statement.executeUpdate();
@@ -69,7 +72,7 @@ public class SqlLiteDatabase implements IDatabase {
                             "PlayerId VARCHAR(36), " +
                             "ObjectiveId VARCHAR(64), " +
                             "IsCompleted BOOLEAN);",
-                    getConfig().getString("storage.tablePrefix")
+                    _config.storageTablePrefix
             );
             statement = connection.prepareStatement(sql);
             statement.executeUpdate();
@@ -79,7 +82,7 @@ public class SqlLiteDatabase implements IDatabase {
                             "PlayerId VARCHAR(36), " +
                             "ObjectiveId VARCHAR(64), " +
                             "IsCompleted BOOLEAN);",
-                    getConfig().getString("storage.tablePrefix")
+                    _config.storageTablePrefix
             );
             statement = connection.prepareStatement(sql);
             statement.executeUpdate();
@@ -97,7 +100,7 @@ public class SqlLiteDatabase implements IDatabase {
         {
             String sql = String.format("INSERT INTO %s_playerData (PlayerId, AchievementPoints, CompletedDailyObjectives, CompletedWeeklyObjectives) " +
                             "VALUES (?, ?, ?, ?);",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
 
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 // Set parameters for the prepared statement
@@ -121,7 +124,7 @@ public class SqlLiteDatabase implements IDatabase {
         try (Connection connection = CreateConnection())
         {
             String sql = String.format("UPDATE %s_playerData SET AchievementPoints=?, CompletedDailyObjectives=?, CompletedWeeklyObjectives=? WHERE PlayerId=?;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setLong(1, achievementPoints);
                 statement.setInt(2, completedDailyObjectives);
@@ -141,7 +144,7 @@ public class SqlLiteDatabase implements IDatabase {
         try (Connection connection = CreateConnection())
         {
             String sql = String.format("TRUNCATE %s_playerData;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.executeUpdate();
             }
@@ -157,7 +160,7 @@ public class SqlLiteDatabase implements IDatabase {
         try (Connection connection = CreateConnection())
         {
             String sql = String.format("UPDATE %s_playerData SET AchievementPoints=AchievementPoints+? WHERE PlayerId=?;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setLong(1, points);
                 statement.setString(2, playerId.toString());
@@ -175,7 +178,7 @@ public class SqlLiteDatabase implements IDatabase {
         try (Connection connection = CreateConnection())
         {
             String sql = String.format("UPDATE %s_playerData SET CompletedDailyObjectives=CompletedDailyObjectives+1 WHERE PlayerId=?;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, playerId.toString());
                 statement.executeUpdate();
@@ -192,7 +195,7 @@ public class SqlLiteDatabase implements IDatabase {
         try (Connection connection = CreateConnection())
         {
             String sql = String.format("UPDATE %s_playerData SET CompletedWeeklyObjectives=CompletedWeeklyObjectives+1 WHERE PlayerId=?;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, playerId.toString());
                 statement.executeUpdate();
@@ -210,7 +213,7 @@ public class SqlLiteDatabase implements IDatabase {
         try (Connection connection = CreateConnection())
         {
             String sql = String.format("SELECT * FROM %s_playerData WHERE PlayerId=? LIMIT 1;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, playerId.toString());
                 try (ResultSet result = statement.executeQuery()) {
@@ -242,7 +245,7 @@ public class SqlLiteDatabase implements IDatabase {
         {
             String sql = String.format("INSERT INTO %s_daily_obj (PlayerId, ObjectiveId, IsCompleted) " +
                             "VALUES (?, ?, ?);",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
 
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 // Set parameters for the prepared statement
@@ -265,7 +268,7 @@ public class SqlLiteDatabase implements IDatabase {
         try (Connection connection = CreateConnection())
         {
             String sql = String.format("UPDATE %s_daily_obj SET IsCompleted=? WHERE PlayerId=? AND ObjectiveId=?;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setBoolean(1, isCompleted);
                 statement.setString(2, playerId.toString());
@@ -285,7 +288,7 @@ public class SqlLiteDatabase implements IDatabase {
         try (Connection connection = CreateConnection())
         {
             String sql = String.format("SELECT * FROM %s_daily_obj WHERE PlayerId=? AND ObjectiveId=? LIMIT 1;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, playerId.toString());
                 statement.setString(2, objectiveId);
@@ -310,7 +313,7 @@ public class SqlLiteDatabase implements IDatabase {
         try (Connection connection = CreateConnection())
         {
             String sql = String.format("TRUNCATE %s_daily_obj;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.executeUpdate();
             }
@@ -327,7 +330,7 @@ public class SqlLiteDatabase implements IDatabase {
         try (Connection connection = CreateConnection())
         {
             String sql = String.format("SELECT * FROM %s_daily_obj WHERE PlayerId=?;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, playerId.toString());
                 try (ResultSet result = statement.executeQuery()) {
@@ -358,7 +361,7 @@ public class SqlLiteDatabase implements IDatabase {
         {
             String sql = String.format("INSERT INTO %s_weekly_obj (PlayerId, ObjectiveId, IsCompleted) " +
                             "VALUES (?, ?, ?);",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
 
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 // Set parameters for the prepared statement
@@ -381,7 +384,7 @@ public class SqlLiteDatabase implements IDatabase {
         try (Connection connection = CreateConnection())
         {
             String sql = String.format("UPDATE %s_weekly_obj SET IsCompleted=? WHERE PlayerId=? AND ObjectiveId=?;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setBoolean(1, isCompleted);
                 statement.setString(2, playerId.toString());
@@ -401,7 +404,7 @@ public class SqlLiteDatabase implements IDatabase {
         try (Connection connection = CreateConnection())
         {
             String sql = String.format("SELECT * FROM %s_weekly_obj WHERE PlayerId=? AND ObjectiveId=? LIMIT 1;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, playerId.toString());
                 statement.setString(2, objectiveId);
@@ -426,7 +429,7 @@ public class SqlLiteDatabase implements IDatabase {
         try (Connection connection = CreateConnection())
         {
             String sql = String.format("TRUNCATE %s_weekly_obj;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.executeUpdate();
             }
@@ -443,7 +446,7 @@ public class SqlLiteDatabase implements IDatabase {
         try (Connection connection = CreateConnection())
         {
             String sql = String.format("SELECT * FROM %s_weekly_obj WHERE PlayerId=?;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, playerId.toString());
                 try (ResultSet result = statement.executeQuery()) {
@@ -474,7 +477,7 @@ public class SqlLiteDatabase implements IDatabase {
         {
             String sql = String.format("INSERT INTO %s_comp_achievements (PlayerId, AchievementId) " +
                             "VALUES (?, ?);",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
 
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 // Set parameters for the prepared statement
@@ -496,7 +499,7 @@ public class SqlLiteDatabase implements IDatabase {
         try (Connection connection = CreateConnection())
         {
             String sql = String.format("TRUNCATE %s_comp_achievements;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.executeUpdate();
             }
@@ -513,7 +516,7 @@ public class SqlLiteDatabase implements IDatabase {
         try (Connection connection = CreateConnection())
         {
             String sql = String.format("SELECT * FROM %s_comp_achievements WHERE PlayerId=? AND AchievementId=? LIMIT 1;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, playerId.toString());
                 statement.setString(2, achievementId);
@@ -540,7 +543,7 @@ public class SqlLiteDatabase implements IDatabase {
         try (Connection connection = CreateConnection())
         {
             String sql = String.format("SELECT * FROM %s_comp_achievements WHERE PlayerId=?;",
-                    getConfig().getString("storage.tablePrefix"));
+                    _config.storageTablePrefix);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, playerId.toString());
                 try (ResultSet result = statement.executeQuery()) {
