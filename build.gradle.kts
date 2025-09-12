@@ -16,7 +16,6 @@ plugins {
 val javaVersion: String by project
 val paperApiVersion: String by project
 val hikariCpVersion: String by project
-val snakeYamlVersion: String by project
 val mineCoreLibVersion: String by project
 val spiGuiVersion: String by project
 val vaultApiVersion: String by project

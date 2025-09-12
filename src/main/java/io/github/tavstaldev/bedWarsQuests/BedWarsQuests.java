@@ -62,7 +62,7 @@ public class BedWarsQuests extends PluginBase {
     }
 
     public BedWarsQuests() {
-        super("https://github.com/TavstalDev/BedWarsQuests/releases/latest");
+        super(true, "https://github.com/TavstalDev/BedWarsQuests/releases/latest");
     }
 
     @Override
