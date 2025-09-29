@@ -11,6 +11,7 @@ import io.github.tavstaldev.bedWarsQuests.events.BlockEventListener;
 import io.github.tavstaldev.bedWarsQuests.events.PlayerEventListener;
 import io.github.tavstaldev.bedWarsQuests.managers.AchievementManager;
 import io.github.tavstaldev.bedWarsQuests.managers.ObjectiveManager;
+import io.github.tavstaldev.bedWarsQuests.tasks.CacheCleanTask;
 import io.github.tavstaldev.bedWarsQuests.tasks.RefreshTask;
 import io.github.tavstaldev.bedWarsQuests.utils.EconomyUtils;
 import io.github.tavstaldev.minecorelib.PluginBase;
@@ -28,6 +29,7 @@ public class BedWarsQuests extends PluginBase {
     private IDatabase _database;
     private AchievementManager _achievementManager;
     private ObjectiveManager _objectiveManager;
+    private CacheCleanTask cacheCleanTask; // Task for cleaning player caches.
 
     public static PluginLogger Logger() {
         return Instance.getCustomLogger();
@@ -162,6 +164,12 @@ public class BedWarsQuests extends PluginBase {
         // Register tasks
         RefreshTask task = new RefreshTask();
         this.getServer().getScheduler().scheduleSyncRepeatingTask(this, task, 20L * 30, 20L * 900);
+
+        // Register cache cleanup task.
+        if (cacheCleanTask != null && !cacheCleanTask.isCancelled())
+            cacheCleanTask.cancel();
+        cacheCleanTask = new CacheCleanTask(); // Runs every 5 minutes
+        cacheCleanTask.runTaskTimer(this, 0, 5 * 60 * 20);
 
         _logger.Ok(String.format("%s has been successfully loaded.", getProjectName()));
         if (Config().checkForUpdates) {
