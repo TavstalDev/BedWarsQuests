@@ -1,11 +1,11 @@
 main: io.github.tavstaldev.bedWarsQuests.BedWarsQuests
-version: 1.0.2
+version: 1.0.3
 
 name: BedWarsQuests
 api-version: '1.21'
 prefix: BedWarsQuests
 authors: [ Tavstal ]
-description:
+description: A simple BedWars quests and achievements plugin.
 website: https://tavstaldev.github.io/
 softdepend: [Vault, BedWars, ScreamingBedWars, BanyaszLib]
 commands:
@@ -13,7 +13,7 @@ commands:
     description: Opens the BedWars arena selection GUI.
     usage: /bedwarsquests
     permission: bedwarsquests.commands.gui
-    aliases: [ "bwgui", "bedgui", "bwarenas" ]
+    aliases: [ "bedwarsquests", "bedwarsq", "bwq" ]
     subcommands:
       help:
         description: "Show help for the bedwarsquests command"

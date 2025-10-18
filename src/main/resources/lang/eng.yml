@@ -1,0 +1,120 @@
+General:
+  NoPermission: "%prefix% &cYou don't have permission for that."
+
+Rewards:
+  AchievementComplete: "%prefix% &aYou successfully completed the &e%achievement_name% &achallenge!"
+  AchievementPoints: "%prefix% &aYou got &7%amount% &aachievement points as a reward!"
+  Vault:
+    Achievement: "%prefix% &aYou got &7%amount% T &aas a reward for the &e%name%&a challenge!"
+    Quest: "%prefix% &aYou got &7%amount% T &aas a reward for the &e%name%&a quest!"
+  Experience:
+    Achievement: "%prefix% &aYou got &b%amount% XP &aas a reward for the &e%name%&a challenge!"
+    Quest: "%prefix% &aYou got &b%amount% XP &aas a reward for the &e%name%&a quest!"
+  Coins:
+    Achievement: "%prefix% &aYou got &6%amount% COINS &aas a reward for the &e%name%&a challenge!"
+    Quest: "%prefix% &aYou got &6%amount% COINS &aas a reward for the &e%name%&a quest!"
+  Command: "%prefix% &aYour reward has been executed."
+
+Commands:
+  ConsoleCaller: "%prefix% &cOnly players can use this command."
+  UnknownError: "%prefix% &cAn unknown error occurred. Please report it!"
+  InGame: "%prefix% &cYou can't use this command while in an active game."
+  Common:
+    InvalidPage: "%prefix% &cInvalid page number."
+  Help:
+    Desc: "Shows information about the commands."
+    Title: "&8&m        &r &bBedWars&3Quests &7Help &8&m    &r &7Page &3%current_page%&7/&3%max_page% &8&m        &r"
+    Info: |-
+      &r
+      &r  &c&l[]&r &8- &7Required,   &e&l<>&r &8- &7Optional
+      &r
+    Line: "&r  &b/%command% %subcommand%&3%syntax% &8- &7%description%"
+    Bottom: |-
+      &r
+      &8&m                       &r %previous_btn%&3%current_page%&7/&3%max_page%%next_btn% &8&m                       &r
+    PrevBtn: "&b<< "
+    NextBtn: " &b>>"
+  Version:
+    Desc: "Shows the plugin version."
+    Current: "%prefix% &aYou are using version '&3%version%&a' of BedWarsQuests."
+    UpToDate: "%prefix% &aBedWarsQuests is up-to-date."
+    Outdated: "%prefix% &cBedWarsQuests is outdated. You can download it here: &e%link%"
+  Reload:
+    Desc: "Reloads the plugin config and messages."
+    Done: "%prefix% &aPlugin updated."
+  Reset:
+    Desc: "Resets the player's quests and achievements."
+    Confirmation: "%prefix% &cAre you sure you want to reset your quests and achievements? Confirm with &e/bwgui reset confirm&c."
+    Done: "%prefix% &aSuccessfully reset your plugin data."
+  Gui:
+    Desc: "Opens the GUI."
+
+GUI:
+  Cancel: "&cCancel"
+  Confirm: "&aConfirm"
+  Close: "&cClose"
+  Back: "&cBack"
+  PreviousPage: "&7Previous Page"
+  NextPage: "&7Next Page"
+  Page: "&7Page: &f%page%"
+  Completed: "&aCompleted"
+  InProgress: "&eIn Progress"
+  Main:
+    Title: "&8Quests and Achievements"
+    Item: "&aBedWars Quests and Achievements"
+    Lore:
+      - "&7&m                                 "
+      - "&fCheck out your quests,"
+      - "&fachievements, and grab"
+      - "&fyour rewards!"
+      - "&7&m                                 "
+  Achievements:
+    Title: "&8Achievements"
+    Item: "&aAchievements"
+    Lore:
+      - "&7&m                                 "
+      - "&fCheck out your achievements,"
+      - "&fand grab your rewards!"
+      - "&7&m                                 "
+  DailyQuestName: "&aDaily Quest: &f%quest_name%"
+  DailyQuestLore:
+    - "&7%quest_description%"
+    - " "
+    - "&7Status: &f%status%"
+    - "&7Rewards:"
+    - "%reward%"
+    - " "
+    - "&8&oDaily quests refresh every"
+    - "&8&oday at dawn."
+  WeeklyQuestName: "&aWeekly Quest: &f%quest_name%"
+  WeeklyQuestLore:
+    - "%quest_description%"
+    - " "
+    - "&7Status: &f%status%"
+    - "&7Rewards:"
+    - "%reward%"
+    - " "
+    - "&8&oWeekly quests refresh every"
+    - "&8&oMonday."
+  AchievementData:
+    LockedName: "&c%achievement_name%"
+    UnlockedName: "&a%achievement_name%"
+    Lore:
+      - "%achievement_description%"
+      - " "
+      - "&7Rewards:"
+      - "%reward%"
+      - " "
+      - "%status%"
+    LockedStatus: "&cLocked"
+    UnlockedStatus: "&aCompleted"
+  Rewards:
+    AchievementPoint: "&7- &e%amount% &7achievement points"
+    Coins: "&7- &e%amount% &6Coins"
+    Vault: "&7- &e%amount% &7T"
+    Experience: "&7- &e%amount% &7XP"
+    Command: "&7- &e%command%"
+
+
+# DO NOT TOUCH THIS. This helps to handle config related changes after updates.
+FileVersion: 1
