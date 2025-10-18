@@ -7,7 +7,6 @@ import io.github.tavstaldev.bedWarsQuests.models.database.DailyObjectiveData;
 import io.github.tavstaldev.bedWarsQuests.models.database.PlayerData;
 import io.github.tavstaldev.bedWarsQuests.models.database.WeeklyObjectiveData;
 import io.github.tavstaldev.minecorelib.core.PluginLogger;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.Connection;
@@ -18,9 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+// TODO: Add documentation
 public class SqlLiteDatabase implements IDatabase {
+    // TODO: Implement cache
     private BWQConfiguration _config;
-    private final PluginLogger _logger = BedWarsQuests.Logger().WithModule(SqlLiteDatabase.class);
+    private final PluginLogger _logger = BedWarsQuests.Logger().withModule(SqlLiteDatabase.class);
 
     @Override
     public void load() {
@@ -30,7 +31,7 @@ public class SqlLiteDatabase implements IDatabase {
     @Override
     public void unload() {}
 
-    public Connection CreateConnection() {
+    public Connection createConnection() {
         try
         {
             Class.forName("org.sqlite.JDBC");
@@ -38,14 +39,14 @@ public class SqlLiteDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while creating db connection...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while creating db connection...\n%s", ex.getMessage()));
             return null;
         }
     }
 
     @Override
     public void checkSchema() {
-        try (Connection connection = CreateConnection())
+        try (Connection connection = createConnection())
         {
             // PlayerData
             String sql = String.format("CREATE TABLE IF NOT EXISTS %s_playerData (" +
@@ -89,14 +90,14 @@ public class SqlLiteDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while creating tables...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while creating tables...\n%s", ex.getMessage()));
         }
     }
 
     //#region PlayerData
     @Override
     public void addPlayerData(UUID playerId) {
-        try (Connection connection = CreateConnection())
+        try (Connection connection = createConnection())
         {
             String sql = String.format("INSERT INTO %s_playerData (PlayerId, AchievementPoints, CompletedDailyObjectives, CompletedWeeklyObjectives) " +
                             "VALUES (?, ?, ?, ?);",
@@ -115,13 +116,13 @@ public class SqlLiteDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while adding tables...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while adding tables...\n%s", ex.getMessage()));
         }
     }
 
     @Override
     public void updatePlayerData(UUID playerId, long achievementPoints, int completedDailyObjectives, int completedWeeklyObjectives) {
-        try (Connection connection = CreateConnection())
+        try (Connection connection = createConnection())
         {
             String sql = String.format("UPDATE %s_playerData SET AchievementPoints=?, CompletedDailyObjectives=?, CompletedWeeklyObjectives=? WHERE PlayerId=?;",
                     _config.storageTablePrefix);
@@ -135,13 +136,13 @@ public class SqlLiteDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while updating the playerData table...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while updating the playerData table...\n%s", ex.getMessage()));
         }
     }
 
     @Override
     public void wipePlayerData() {
-        try (Connection connection = CreateConnection())
+        try (Connection connection = createConnection())
         {
             String sql = String.format("TRUNCATE %s_playerData;",
                     _config.storageTablePrefix);
@@ -151,13 +152,13 @@ public class SqlLiteDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while wiping playerData...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while wiping playerData...\n%s", ex.getMessage()));
         }
     }
 
     @Override
     public void increaseAchievementPoints(UUID playerId, long points) {
-        try (Connection connection = CreateConnection())
+        try (Connection connection = createConnection())
         {
             String sql = String.format("UPDATE %s_playerData SET AchievementPoints=AchievementPoints+? WHERE PlayerId=?;",
                     _config.storageTablePrefix);
@@ -169,13 +170,13 @@ public class SqlLiteDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while increasing achievement points in playerData table...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while increasing achievement points in playerData table...\n%s", ex.getMessage()));
         }
     }
 
     @Override
     public void increaseCompletedDailyObjectives(UUID playerId) {
-        try (Connection connection = CreateConnection())
+        try (Connection connection = createConnection())
         {
             String sql = String.format("UPDATE %s_playerData SET CompletedDailyObjectives=CompletedDailyObjectives+1 WHERE PlayerId=?;",
                     _config.storageTablePrefix);
@@ -186,13 +187,13 @@ public class SqlLiteDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while increasing completed daily objectives in playerData table...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while increasing completed daily objectives in playerData table...\n%s", ex.getMessage()));
         }
     }
 
     @Override
     public void increaseCompletedWeeklyObjectives(UUID playerId) {
-        try (Connection connection = CreateConnection())
+        try (Connection connection = createConnection())
         {
             String sql = String.format("UPDATE %s_playerData SET CompletedWeeklyObjectives=CompletedWeeklyObjectives+1 WHERE PlayerId=?;",
                     _config.storageTablePrefix);
@@ -203,14 +204,14 @@ public class SqlLiteDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while increasing completed weekly objectives in playerData table...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while increasing completed weekly objectives in playerData table...\n%s", ex.getMessage()));
         }
     }
 
     @Override
     public @Nullable PlayerData getPlayerData(UUID playerId) {
         PlayerData data = null;
-        try (Connection connection = CreateConnection())
+        try (Connection connection = createConnection())
         {
             String sql = String.format("SELECT * FROM %s_playerData WHERE PlayerId=? LIMIT 1;",
                     _config.storageTablePrefix);
@@ -230,7 +231,7 @@ public class SqlLiteDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while finding playerData...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while finding playerData...\n%s", ex.getMessage()));
             return null;
         }
 
@@ -241,7 +242,7 @@ public class SqlLiteDatabase implements IDatabase {
     //#region Daily Objectives
     @Override
     public void addPlayerDailyObjective(UUID playerId, String objectiveId) {
-        try (Connection connection = CreateConnection())
+        try (Connection connection = createConnection())
         {
             String sql = String.format("INSERT INTO %s_daily_obj (PlayerId, ObjectiveId, IsCompleted) " +
                             "VALUES (?, ?, ?);",
@@ -259,13 +260,13 @@ public class SqlLiteDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while adding dailyObjective...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while adding dailyObjective...\n%s", ex.getMessage()));
         }
     }
 
     @Override
     public void updatePlayerDailyObjective(UUID playerId, String objectiveId, boolean isCompleted) {
-        try (Connection connection = CreateConnection())
+        try (Connection connection = createConnection())
         {
             String sql = String.format("UPDATE %s_daily_obj SET IsCompleted=? WHERE PlayerId=? AND ObjectiveId=?;",
                     _config.storageTablePrefix);
@@ -278,14 +279,14 @@ public class SqlLiteDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while updating the dailyObjectiveData table...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while updating the dailyObjectiveData table...\n%s", ex.getMessage()));
         }
     }
 
     @Override
     public boolean hasPlayerCompletedDailyObjective(UUID playerId, String objectiveId) {
         boolean data = false;
-        try (Connection connection = CreateConnection())
+        try (Connection connection = createConnection())
         {
             String sql = String.format("SELECT * FROM %s_daily_obj WHERE PlayerId=? AND ObjectiveId=? LIMIT 1;",
                     _config.storageTablePrefix);
@@ -301,7 +302,7 @@ public class SqlLiteDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while finding dailyObjectiveData...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while finding dailyObjectiveData...\n%s", ex.getMessage()));
             return false;
         }
 
@@ -310,7 +311,7 @@ public class SqlLiteDatabase implements IDatabase {
 
     @Override
     public void wipePlayerDailyObjectives() {
-        try (Connection connection = CreateConnection())
+        try (Connection connection = createConnection())
         {
             String sql = String.format("TRUNCATE %s_daily_obj;",
                     _config.storageTablePrefix);
@@ -320,14 +321,14 @@ public class SqlLiteDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while wiping dailyObjectiveData...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while wiping dailyObjectiveData...\n%s", ex.getMessage()));
         }
     }
 
     @Override
     public List<DailyObjectiveData> getPlayerDailyObjectives(UUID playerId) {
         List<DailyObjectiveData> data = new ArrayList<>();
-        try (Connection connection = CreateConnection())
+        try (Connection connection = createConnection())
         {
             String sql = String.format("SELECT * FROM %s_daily_obj WHERE PlayerId=?;",
                     _config.storageTablePrefix);
@@ -346,7 +347,7 @@ public class SqlLiteDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while getting dailyObjectiveData...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while getting dailyObjectiveData...\n%s", ex.getMessage()));
             return null;
         }
 
@@ -357,7 +358,7 @@ public class SqlLiteDatabase implements IDatabase {
     //#region Weekly Objectives
     @Override
     public void addPlayerWeeklyObjective(UUID playerId, String objectiveId) {
-        try (Connection connection = CreateConnection())
+        try (Connection connection = createConnection())
         {
             String sql = String.format("INSERT INTO %s_weekly_obj (PlayerId, ObjectiveId, IsCompleted) " +
                             "VALUES (?, ?, ?);",
@@ -375,13 +376,13 @@ public class SqlLiteDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while adding weeklyObjective...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while adding weeklyObjective...\n%s", ex.getMessage()));
         }
     }
 
     @Override
     public void updatePlayerWeeklyObjective(UUID playerId, String objectiveId, boolean isCompleted) {
-        try (Connection connection = CreateConnection())
+        try (Connection connection = createConnection())
         {
             String sql = String.format("UPDATE %s_weekly_obj SET IsCompleted=? WHERE PlayerId=? AND ObjectiveId=?;",
                     _config.storageTablePrefix);
@@ -394,14 +395,14 @@ public class SqlLiteDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while updating the weeklyObjectiveData table...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while updating the weeklyObjectiveData table...\n%s", ex.getMessage()));
         }
     }
 
     @Override
     public boolean hasPlayerCompletedWeeklyObjective(UUID playerId, String objectiveId) {
         boolean data = false;
-        try (Connection connection = CreateConnection())
+        try (Connection connection = createConnection())
         {
             String sql = String.format("SELECT * FROM %s_weekly_obj WHERE PlayerId=? AND ObjectiveId=? LIMIT 1;",
                     _config.storageTablePrefix);
@@ -417,7 +418,7 @@ public class SqlLiteDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while finding weeklyObjectiveData...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while finding weeklyObjectiveData...\n%s", ex.getMessage()));
             return false;
         }
 
@@ -426,7 +427,7 @@ public class SqlLiteDatabase implements IDatabase {
 
     @Override
     public void wipePlayerWeeklyObjectives() {
-        try (Connection connection = CreateConnection())
+        try (Connection connection = createConnection())
         {
             String sql = String.format("TRUNCATE %s_weekly_obj;",
                     _config.storageTablePrefix);
@@ -436,14 +437,14 @@ public class SqlLiteDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while wiping weeklyObjectiveData...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while wiping weeklyObjectiveData...\n%s", ex.getMessage()));
         }
     }
 
     @Override
     public List<WeeklyObjectiveData> getPlayerWeeklyObjectives(UUID playerId) {
         List<WeeklyObjectiveData> data = new ArrayList<>();
-        try (Connection connection = CreateConnection())
+        try (Connection connection = createConnection())
         {
             String sql = String.format("SELECT * FROM %s_weekly_obj WHERE PlayerId=?;",
                     _config.storageTablePrefix);
@@ -462,7 +463,7 @@ public class SqlLiteDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while getting weeklyObjectiveData...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while getting weeklyObjectiveData...\n%s", ex.getMessage()));
             return null;
         }
 
@@ -473,7 +474,7 @@ public class SqlLiteDatabase implements IDatabase {
     //#region Completed Achievements
     @Override
     public void addCompletedAchievement(UUID playerId, String achievementId) {
-        try (Connection connection = CreateConnection())
+        try (Connection connection = createConnection())
         {
             String sql = String.format("INSERT INTO %s_comp_achievements (PlayerId, AchievementId) " +
                             "VALUES (?, ?);",
@@ -490,13 +491,13 @@ public class SqlLiteDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while adding completedAchievement...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while adding completedAchievement...\n%s", ex.getMessage()));
         }
     }
 
     @Override
     public void wipeCompletedAchievements() {
-        try (Connection connection = CreateConnection())
+        try (Connection connection = createConnection())
         {
             String sql = String.format("TRUNCATE %s_comp_achievements;",
                     _config.storageTablePrefix);
@@ -506,14 +507,14 @@ public class SqlLiteDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while wiping completedAchievementData...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while wiping completedAchievementData...\n%s", ex.getMessage()));
         }
     }
 
     @Override
     public boolean hasPlayerCompletedAchievement(UUID playerId, String achievementId) {
         boolean data = false;
-        try (Connection connection = CreateConnection())
+        try (Connection connection = createConnection())
         {
             String sql = String.format("SELECT * FROM %s_comp_achievements WHERE PlayerId=? AND AchievementId=? LIMIT 1;",
                     _config.storageTablePrefix);
@@ -531,7 +532,7 @@ public class SqlLiteDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while finding completedAchievementData...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while finding completedAchievementData...\n%s", ex.getMessage()));
             return false;
         }
         return data;
@@ -540,7 +541,7 @@ public class SqlLiteDatabase implements IDatabase {
     @Override
     public List<CompletedAchievementData> getPlayerCompletedAchievements(UUID playerId) {
         List<CompletedAchievementData> data = new ArrayList<>();
-        try (Connection connection = CreateConnection())
+        try (Connection connection = createConnection())
         {
             String sql = String.format("SELECT * FROM %s_comp_achievements WHERE PlayerId=?;",
                     _config.storageTablePrefix);
@@ -558,7 +559,7 @@ public class SqlLiteDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while getting completedAchievementData...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while getting completedAchievementData...\n%s", ex.getMessage()));
             return null;
         }
         return data;

@@ -23,7 +23,9 @@ import java.util.List;
 import java.util.Map;
 
 public class CommandGUI implements CommandExecutor {
-    private final PluginLogger _logger = BedWarsQuests.Logger().WithModule(CommandGUI.class);
+    private final PluginLogger _logger = BedWarsQuests.Logger().withModule(CommandGUI.class);
+    @SuppressWarnings("FieldCanBeLocal")
+    private final String baseCommand = "bwquests";
     private final List<SubCommandData> _subCommands = new ArrayList<>() {
         {
             // HELP
@@ -57,7 +59,7 @@ public class CommandGUI implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
         if (sender instanceof ConsoleCommandSender) {
-            _logger.Info(ChatUtils.translateColors("Commands.ConsoleCaller", true).toString());
+            _logger.info(ChatUtils.translateColors("Commands.ConsoleCaller", true).toString());
             return true;
         }
         Player player = (Player) sender;
@@ -95,7 +97,7 @@ public class CommandGUI implements CommandExecutor {
                             BedWarsQuests.Instance.sendLocalizedMsg(player, "Commands.Version.Outdated", Map.of("link", BedWarsQuests.Instance.getDownloadUrl()));
                         }
                     }).exceptionally(e -> {
-                        _logger.Error("Failed to determine update status: " + e.getMessage());
+                        _logger.error("Failed to determine update status: " + e.getMessage());
                         return null;
                     });
                     return true;
@@ -159,12 +161,14 @@ public class CommandGUI implements CommandExecutor {
     private void help(Player player, int page) {
         int maxPage = 1 + (_subCommands.size() / 15);
 
+        // Ensure the page number is within valid bounds
         if (page > maxPage)
             page = maxPage;
         if (page < 1)
             page = 1;
         int finalPage = page;
 
+        // Send the help menu title and info
         BedWarsQuests.Instance.sendLocalizedMsg(player, "Commands.Help.Title", Map.of(
                         "current_page", finalPage,
                         "max_page", maxPage
@@ -174,6 +178,8 @@ public class CommandGUI implements CommandExecutor {
 
         boolean reachedEnd = false;
         int itemIndex = 0;
+
+        // Display up to 15 subcommands per page
         for (int i = 0; i < 15; i++) {
             int index = itemIndex + (page - 1) * 15;
             if (index >= _subCommands.size()) {
@@ -188,24 +194,26 @@ public class CommandGUI implements CommandExecutor {
                 continue;
             }
 
-            subCommand.send(BedWarsQuests.Instance, player);
+            subCommand.send(BedWarsQuests.Instance, player, baseCommand);
         }
 
-        // Bottom message
-        String previousBtn = BedWarsQuests.Instance.Localize(player, "Commands.Help.PrevBtn");
-        String nextBtn = BedWarsQuests.Instance.Localize(player, "Commands.Help.NextBtn");
-        String bottomMsg = BedWarsQuests.Instance.Localize(player, "Commands.Help.Bottom")
+        // Display navigation buttons for the help menu
+        String previousBtn = BedWarsQuests.Instance.localize(player, "Commands.Help.PrevBtn");
+        String nextBtn = BedWarsQuests.Instance.localize(player, "Commands.Help.NextBtn");
+        String bottomMsg = BedWarsQuests.Instance.localize(player, "Commands.Help.Bottom")
                 .replace("%current_page%", String.valueOf(page))
                 .replace("%max_page%", String.valueOf(maxPage));
 
         Map<String, Component> bottomParams = new HashMap<>();
         if (page > 1)
-            bottomParams.put("previous_btn", ChatUtils.translateColors(previousBtn, true).clickEvent(ClickEvent.runCommand("/bwquests help " + (page - 1))));
+            bottomParams.put("previous_btn", ChatUtils.translateColors(previousBtn, true)
+                    .clickEvent(ClickEvent.runCommand(String.format("/%s help %s", baseCommand, page - 1))));
         else
             bottomParams.put("previous_btn", ChatUtils.translateColors(previousBtn, true));
 
         if (!reachedEnd && maxPage >= page + 1)
-            bottomParams.put("next_btn", ChatUtils.translateColors(nextBtn, true).clickEvent(ClickEvent.runCommand("/bwquests help " + (page + 1))));
+            bottomParams.put("next_btn", ChatUtils.translateColors(nextBtn, true)
+                    .clickEvent(ClickEvent.runCommand(String.format("/%s help %s", baseCommand, page + 1))));
         else
             bottomParams.put("next_btn", ChatUtils.translateColors(nextBtn, true));
 

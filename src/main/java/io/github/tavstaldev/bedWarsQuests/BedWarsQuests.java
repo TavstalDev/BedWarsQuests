@@ -21,61 +21,136 @@ import io.github.tavstaldev.minecorelib.utils.VersionUtils;
 import org.bukkit.Bukkit;
 import org.screamingsandals.bedwars.api.BedwarsAPI;
 
+/**
+ * The BedWarsQuests class is the main plugin class for the BedWarsQuests plugin.
+ * It handles initialization, event registration, database setup, and integration with other plugins.
+ */
 public class BedWarsQuests extends PluginBase {
+    /** Singleton instance of the plugin. */
     public static BedWarsQuests Instance;
-    private SpiGUI _spiGUI;
-    private BedwarsAPI _bedwarsApi;
-    private BanyaszApi _banyaszApi;
-    private IDatabase _database;
-    private AchievementManager _achievementManager;
-    private ObjectiveManager _objectiveManager;
-    private CacheCleanTask cacheCleanTask; // Task for cleaning player caches.
 
+    /** SpiGUI instance for managing GUI interactions. */
+    private SpiGUI _spiGUI;
+
+    /** BedwarsAPI instance for interacting with the BedWars plugin. */
+    private BedwarsAPI _bedwarsApi;
+
+    /** BanyaszApi instance for interacting with the BanyaszLib plugin. */
+    private BanyaszApi _banyaszApi;
+
+    /** Database instance for managing plugin data. */
+    private IDatabase _database;
+
+    /** Manager for handling achievements. */
+    private AchievementManager _achievementManager;
+
+    /** Manager for handling objectives. */
+    private ObjectiveManager _objectiveManager;
+
+    /** Task for cleaning player caches. */
+    private CacheCleanTask cacheCleanTask;
+
+    /**
+     * Retrieves the plugin logger instance.
+     *
+     * @return The PluginLogger instance.
+     */
     public static PluginLogger Logger() {
         return Instance.getCustomLogger();
     }
 
+    /**
+     * Retrieves the plugin translator instance.
+     *
+     * @return The PluginTranslator instance.
+     */
     public static PluginTranslator Translator() {
         return Instance.getTranslator();
     }
 
+    /**
+     * Retrieves the plugin configuration instance.
+     *
+     * @return The BWQConfiguration instance.
+     */
     public static BWQConfiguration Config() {
         return (BWQConfiguration) Instance.getConfig();
     }
 
+    /**
+     * Retrieves the SpiGUI instance.
+     *
+     * @return The SpiGUI instance.
+     */
     public static SpiGUI GUI() {
         return Instance._spiGUI;
     }
 
+    /**
+     * Retrieves the BedwarsAPI instance.
+     *
+     * @return The BedwarsAPI instance.
+     */
     public static BedwarsAPI BedwarsApi() {
         return Instance._bedwarsApi;
     }
 
-    public static BanyaszApi BanyaszApi() { return Instance._banyaszApi; }
+    /**
+     * Retrieves the BanyaszApi instance.
+     *
+     * @return The BanyaszApi instance.
+     */
+    public static BanyaszApi BanyaszApi() {
+        return Instance._banyaszApi;
+    }
+
+    /**
+     * Retrieves the database instance.
+     *
+     * @return The IDatabase instance.
+     */
     public static IDatabase Database() {
         return Instance._database;
     }
+
+    /**
+     * Retrieves the achievement manager instance.
+     *
+     * @return The AchievementManager instance.
+     */
     public static AchievementManager AchievementManager() {
         return Instance._achievementManager;
     }
+
+    /**
+     * Retrieves the objective manager instance.
+     *
+     * @return The ObjectiveManager instance.
+     */
     public static ObjectiveManager ObjectiveManager() {
         return Instance._objectiveManager;
     }
 
+    /**
+     * Constructs a new BedWarsQuests instance.
+     */
     public BedWarsQuests() {
         super(true, "https://github.com/TavstalDev/BedWarsQuests/releases/latest");
     }
 
+    /**
+     * Called when the plugin is enabled. Handles initialization and setup.
+     */
     @Override
     public void onEnable() {
         Instance = this;
         super.onEnable();
         _config = new BWQConfiguration();
         _translator = new PluginTranslator(this, new String[]{"eng", "hun"});
-        _logger.Info(String.format("Loading %s...", getProjectName()));
+        _logger.info(String.format("Loading %s...", getProjectName()));
 
         if (VersionUtils.isLegacy()) {
-            _logger.Error("The plugin is not compatible with legacy versions of Minecraft. Please use a newer version of the game.");
+            _logger.error("The plugin is not compatible with legacy versions of Minecraft. Please use a newer version of the game.");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
@@ -89,40 +164,40 @@ public class BedWarsQuests extends PluginBase {
         saveDefaultConfig();
 
         // Load Localizations
-        if (!_translator.Load()) {
-            _logger.Error("Failed to load localizations... Unloading...");
+        if (!_translator.load()) {
+            _logger.error("Failed to load localizations... Unloading...");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
 
         // Check BedWars Plugin
-        _logger.Debug("Hooking into BedWars...");
+        _logger.debug("Hooking into BedWars...");
         if (Bukkit.getPluginManager().isPluginEnabled("BedWars") || Bukkit.getPluginManager().isPluginEnabled("ScreamingBedWars")) {
             _bedwarsApi = BedwarsAPI.getInstance();
-            _logger.Info("BedWars found and hooked into it.");
+            _logger.info("BedWars found and hooked into it.");
         } else {
-            _logger.Warn("BedWars not found. Unloading...");
+            _logger.warn("BedWars not found. Unloading...");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
 
         // Check BanyaszLib Plugin
-        _logger.Debug("Hooking into BanyaszLib...");
+        _logger.debug("Hooking into BanyaszLib...");
         if (Bukkit.getPluginManager().isPluginEnabled("BanyaszLib")) {
             _banyaszApi = BanyaszApi.getInstance();
-            _logger.Info("BanyaszLib found and hooked into it.");
+            _logger.info("BanyaszLib found and hooked into it.");
         } else {
-            _logger.Warn("BanyaszLib not found. Unloading...");
+            _logger.warn("BanyaszLib not found. Unloading...");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
 
         // Register economy integration
-        _logger.Debug("Hooking into Vault...");
+        _logger.debug("Hooking into Vault...");
         if (EconomyUtils.setupEconomy()) {
-            _logger.Info("Economy plugin found and hooked into Vault.");
+            _logger.info("Economy plugin found and hooked into Vault.");
         } else {
-            _logger.Warn("Economy plugin not found. Unloading...");
+            _logger.warn("Economy plugin not found. Unloading...");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
@@ -147,11 +222,11 @@ public class BedWarsQuests extends PluginBase {
         _database.checkSchema();
 
         // Initialize SpiGUI
-        _logger.Debug("Initializing SpiGUI...");
+        _logger.debug("Initializing SpiGUI...");
         _spiGUI = new SpiGUI(this);
 
         // Register Commands
-        _logger.Debug("Registering commands...");
+        _logger.debug("Registering commands...");
         var command = getCommand("bwquests");
         if (command != null) {
             command.setExecutor(new CommandGUI());
@@ -171,34 +246,40 @@ public class BedWarsQuests extends PluginBase {
         cacheCleanTask = new CacheCleanTask(); // Runs every 5 minutes
         cacheCleanTask.runTaskTimer(this, 0, 5 * 60 * 20);
 
-        _logger.Ok(String.format("%s has been successfully loaded.", getProjectName()));
+        _logger.ok(String.format("%s has been successfully loaded.", getProjectName()));
         if (Config().checkForUpdates) {
             isUpToDate().thenAccept(upToDate -> {
                 if (upToDate) {
-                    _logger.Ok("Plugin is up to date!");
+                    _logger.ok("Plugin is up to date!");
                 } else {
-                    _logger.Warn("A new version of the plugin is available: " + getDownloadUrl());
+                    _logger.warn("A new version of the plugin is available: " + getDownloadUrl());
                 }
             }).exceptionally(e -> {
-                _logger.Error("Failed to determine update status: " + e.getMessage());
+                _logger.error("Failed to determine update status: " + e.getMessage());
                 return null;
             });
         }
     }
 
+    /**
+     * Called when the plugin is disabled. Handles cleanup.
+     */
     @Override
     public void onDisable() {
         super.onDisable();
-        _logger.Info(String.format("%s has been successfully unloaded.", getProjectName()));
+        _logger.info(String.format("%s has been successfully unloaded.", getProjectName()));
     }
 
+    /**
+     * Reloads the plugin configuration and localizations.
+     */
     public void reload() {
-        _logger.Info(String.format("Reloading %s...", getProjectName()));
-        _logger.Debug("Reloading localizations...");
-        _translator.Load();
-        _logger.Debug("Localizations reloaded.");
-        _logger.Debug("Reloading configuration...");
+        _logger.info(String.format("Reloading %s...", getProjectName()));
+        _logger.debug("Reloading localizations...");
+        _translator.load();
+        _logger.debug("Localizations reloaded.");
+        _logger.debug("Reloading configuration...");
         _config.load();
-        _logger.Debug("Configuration reloaded.");
+        _logger.debug("Configuration reloaded.");
     }
 }

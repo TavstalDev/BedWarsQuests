@@ -1,6 +1,5 @@
 package io.github.tavstaldev.bedWarsQuests.utils;
 
-import io.github.tavstaldev.bedWarsQuests.BedWarsQuests;
 import org.bukkit.Material;
 
 /**

@@ -7,35 +7,62 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.screamingsandals.bedwars.api.statistics.PlayerStatistic;
 
+/**
+ * The BedBreakCriteria class represents a specific achievement criterion
+ * that checks if a player has broken a certain number of beds in a match
+ * or across all matches, depending on the configuration.
+ */
 public class BedBreakCriteria extends AchievementCriteria {
+    // The number of beds that need to be broken to satisfy the criterion.
     private final int count;
 
+    /**
+     * Constructs a BedBreakCriteria instance with the specified parameters.
+     *
+     * @param operator      The comparison operator to use (e.g., EQUALS, GREATER_THAN).
+     * @param isSingleMatch Whether the criterion applies to a single match or all matches.
+     * @param count         The number of beds required to satisfy the criterion.
+     */
     public BedBreakCriteria(String operator, boolean isSingleMatch, int count) {
         super("bed_break", operator, isSingleMatch);
         this.count = count;
     }
 
+    /**
+     * Checks if the criterion is satisfied for the given player and event.
+     *
+     * @param player        The player whose progress is being checked.
+     * @param event         The event that triggered the check.
+     * @param isAchievement Whether the check is for an achievement or a daily objective.
+     * @return True if the criterion is satisfied, false otherwise.
+     */
     @Override
     public boolean isSatisfied(Player player, Event event, boolean isAchievement) {
         int value = -1;
-        if (singleMatch)
-        {
+
+        // If the criterion applies to a single match, retrieve the player's match stats.
+        if (singleMatch) {
             value = PlayerCacheManager.get(player.getUniqueId()).getMatchStats().BedsDestroyed;
-        }
-        else {
+        } else {
+            // Retrieve the player's overall or daily statistics based on the isAchievement flag.
             PlayerStatistic statistic;
             if (isAchievement) {
                 statistic = BedWarsQuests.BedwarsApi().getStatisticsManager().getStatistic(player.getUniqueId());
             } else {
                 statistic = BedWarsQuests.BedwarsApi().getStatisticsManager().getDailyStatistic(player.getUniqueId());
             }
+
+            // If the statistic is null, log a warning and return false.
             if (statistic == null) {
-                BedWarsQuests.Logger().Warn("Player statistic is null for player: " + player.getName());
+                BedWarsQuests.Logger().warn("Player statistic is null for player: " + player.getName());
                 return false;
             }
+
+            // Retrieve the number of beds destroyed from the player's statistics.
             value = statistic.getDestroyedBeds();
         }
 
+        // Compare the retrieved value with the required count using the specified operator.
         return switch (getOperator()) {
             case EQUALS -> value == count;
             case NOT_EQUALS -> value != count;

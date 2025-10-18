@@ -28,7 +28,7 @@ public class BWQConfiguration extends ConfigurationBase {
     @Override
     protected void loadDefaults() {
         // General
-        resolve("locale", "hun");
+        resolve("locale", "eng");
         resolve("usePlayerLocale", true);
         checkForUpdates = resolveGet("checkForUpdates", true);
         debug = resolveGet("debug", false);

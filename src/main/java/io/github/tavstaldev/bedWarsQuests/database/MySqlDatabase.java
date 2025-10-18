@@ -18,15 +18,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+// TODO: Add documentation
 public class MySqlDatabase implements IDatabase {
+    // TODO: Implement cache
     private HikariDataSource _dataSource;
     private BWQConfiguration _config;
-    private final PluginLogger _logger = BedWarsQuests.Logger().WithModule(MySqlDatabase.class);
+    private final PluginLogger _logger = BedWarsQuests.Logger().withModule(MySqlDatabase.class);
 
     @Override
     public void load() {
         _config = BedWarsQuests.Config();
-        _dataSource = CreateDataSource();
+        _dataSource = createDataSource();
     }
 
     @Override
@@ -37,7 +39,7 @@ public class MySqlDatabase implements IDatabase {
         }
     }
 
-    public HikariDataSource CreateDataSource() {
+    public HikariDataSource createDataSource() {
         try
         {
             HikariConfig config = new HikariConfig();
@@ -50,7 +52,7 @@ public class MySqlDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened during the creation of database connection...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened during the creation of database connection...\n%s", ex.getMessage()));
             return null;
         }
     }
@@ -101,7 +103,7 @@ public class MySqlDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while creating tables...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while creating tables...\n%s", ex.getMessage()));
         }
     }
 
@@ -127,7 +129,7 @@ public class MySqlDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while adding playerData...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while adding playerData...\n%s", ex.getMessage()));
         }
     }
 
@@ -147,7 +149,7 @@ public class MySqlDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while updating the playerData table...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while updating the playerData table...\n%s", ex.getMessage()));
         }
     }
 
@@ -163,7 +165,7 @@ public class MySqlDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while wiping playerData...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while wiping playerData...\n%s", ex.getMessage()));
         }
     }
 
@@ -181,7 +183,7 @@ public class MySqlDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while increasing achievement points in playerData table...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while increasing achievement points in playerData table...\n%s", ex.getMessage()));
         }
     }
 
@@ -198,7 +200,7 @@ public class MySqlDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while increasing completed daily objectives in playerData table...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while increasing completed daily objectives in playerData table...\n%s", ex.getMessage()));
         }
     }
 
@@ -215,7 +217,7 @@ public class MySqlDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while increasing completed weekly objectives in playerData table...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while increasing completed weekly objectives in playerData table...\n%s", ex.getMessage()));
         }
     }
 
@@ -242,7 +244,7 @@ public class MySqlDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while finding playerData...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while finding playerData...\n%s", ex.getMessage()));
             return null;
         }
 
@@ -271,7 +273,7 @@ public class MySqlDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while adding dailyObjective...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while adding dailyObjective...\n%s", ex.getMessage()));
         }
     }
 
@@ -290,7 +292,7 @@ public class MySqlDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while updating the dailyObjectiveData table...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while updating the dailyObjectiveData table...\n%s", ex.getMessage()));
         }
     }
 
@@ -313,7 +315,7 @@ public class MySqlDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while finding dailyObjectiveData...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while finding dailyObjectiveData...\n%s", ex.getMessage()));
             return false;
         }
 
@@ -332,7 +334,7 @@ public class MySqlDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while wiping dailyObjectiveData...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while wiping dailyObjectiveData...\n%s", ex.getMessage()));
         }
     }
 
@@ -358,7 +360,7 @@ public class MySqlDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while getting dailyObjectiveData...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while getting dailyObjectiveData...\n%s", ex.getMessage()));
             return null;
         }
 
@@ -387,7 +389,7 @@ public class MySqlDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while adding weeklyObjective...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while adding weeklyObjective...\n%s", ex.getMessage()));
         }
     }
 
@@ -406,7 +408,7 @@ public class MySqlDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while updating the weeklyObjectiveData table...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while updating the weeklyObjectiveData table...\n%s", ex.getMessage()));
         }
     }
 
@@ -429,7 +431,7 @@ public class MySqlDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while finding weeklyObjectiveData...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while finding weeklyObjectiveData...\n%s", ex.getMessage()));
             return false;
         }
 
@@ -448,7 +450,7 @@ public class MySqlDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while wiping weeklyObjectiveData...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while wiping weeklyObjectiveData...\n%s", ex.getMessage()));
         }
     }
 
@@ -474,7 +476,7 @@ public class MySqlDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while getting weeklyObjectiveData...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while getting weeklyObjectiveData...\n%s", ex.getMessage()));
             return null;
         }
 
@@ -502,7 +504,7 @@ public class MySqlDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while adding completedAchievement...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while adding completedAchievement...\n%s", ex.getMessage()));
         }
     }
 
@@ -518,7 +520,7 @@ public class MySqlDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while wiping completedAchievementData...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while wiping completedAchievementData...\n%s", ex.getMessage()));
         }
     }
 
@@ -543,7 +545,7 @@ public class MySqlDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while finding completedAchievementData...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while finding completedAchievementData...\n%s", ex.getMessage()));
             return false;
         }
         return data;
@@ -570,7 +572,7 @@ public class MySqlDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.Error(String.format("Unknown error happened while getting completedAchievementData...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while getting completedAchievementData...\n%s", ex.getMessage()));
             return null;
         }
         return data;
