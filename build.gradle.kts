@@ -19,6 +19,7 @@ val hikariCpVersion: String by project
 val mineCoreLibVersion: String by project
 val spiGuiVersion: String by project
 val vaultApiVersion: String by project
+val caffeineVersion: String by project
 val projectPackageName = "${project.group}.bedWarsQuests"
 
 // Configure Java toolchain and compatibility settings
@@ -69,6 +70,8 @@ dependencies {
     implementation("com.samjakob:SpiGUI:${spiGuiVersion}")
     // Custom library for core functionality
     implementation(files("libs/MineCoreLib-${mineCoreLibVersion}.jar"))
+    // SQL caching
+    implementation("com.github.ben-manes.caffeine:caffeine:${caffeineVersion}")
 }
 
 // Disable the default JAR task
@@ -82,8 +85,15 @@ tasks.shadowJar {
     manifest {
         attributes["paperweight-mappings-namespace"] = "spigot" // Add custom manifest attributes
     }
+
+    exclude("com/google/**")
+    exclude("org/jspecify/**")
+    exclude("org/slf4j/**")
+
     // Relocate packages to avoid conflicts
     relocate("com.samjakob.spigui", "${projectPackageName}.shadow.spigui")
+    relocate("com.zaxxer.hikari", "${projectPackageName}.shadow.hikari")
+    relocate("com.github.benmanes.caffeine", "${projectPackageName}.shadow.caffeine")
 }
 
 // Ensure the Shadow JAR task runs during the build process
