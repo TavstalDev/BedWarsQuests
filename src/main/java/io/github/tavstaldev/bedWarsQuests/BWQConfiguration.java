@@ -32,7 +32,7 @@ public class BWQConfiguration extends ConfigurationBase {
         resolve("usePlayerLocale", true);
         checkForUpdates = resolveGet("checkForUpdates", true);
         debug = resolveGet("debug", false);
-        prefix = resolveGet("prefix", "&cBedWars&fQuests &8»");
+        prefix = resolveGet("prefix", "&bBedWars&3Quests &8»");
 
         // Dates
         resolve("dates.daily-refresh", LocalDate.now().plusDays(1).atStartOfDay().toString());
