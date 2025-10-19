@@ -2,7 +2,7 @@
 
 ![Release (latest by date)](https://img.shields.io/github/v/release/TavstalDev/BedWarsQuests?style=plastic-square)
 ![Workflow Status](https://img.shields.io/github/actions/workflow/status/TavstalDev/BedWarsQuests/ghrelease.yml?branch=stable&label=build&style=plastic-square)
-![License](https://img.shields.io/github/license/TavstalDev/BedWarsQuests?style=plastic-square)
+![License](https://img.shields.io/github/license/TavstalDev/BedWarsQuests)
 ![Downloads](https://img.shields.io/github/downloads/TavstalDev/BedWarsQuests/total?style=plastic-square)
 ![Issues](https://img.shields.io/github/issues/TavstalDev/BedWarsQuests?style=plastic-square)
 
