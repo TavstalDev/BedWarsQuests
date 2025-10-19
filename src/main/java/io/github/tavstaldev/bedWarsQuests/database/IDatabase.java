@@ -1,9 +1,7 @@
 package io.github.tavstaldev.bedWarsQuests.database;
 
-import io.github.tavstaldev.bedWarsQuests.models.database.CompletedAchievementData;
-import io.github.tavstaldev.bedWarsQuests.models.database.DailyObjectiveData;
+import io.github.tavstaldev.bedWarsQuests.models.database.ObjectiveData;
 import io.github.tavstaldev.bedWarsQuests.models.database.PlayerData;
-import io.github.tavstaldev.bedWarsQuests.models.database.WeeklyObjectiveData;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -33,16 +31,22 @@ public interface IDatabase {
     @Nullable PlayerData getPlayerData(UUID playerId);
     //#endregion
 
+    @Nullable Boolean isWeeklyObjective(UUID playerId, String objectiveId);
+
     //#region Daily Objectives
     void addPlayerDailyObjective(UUID playerId, String objectiveId);
 
     void updatePlayerDailyObjective(UUID playerId, String objectiveId, boolean isCompleted);
 
-    boolean hasPlayerCompletedDailyObjective(UUID playerId, String objectiveId);
-
     void wipePlayerDailyObjectives();
 
-    List<DailyObjectiveData> getPlayerDailyObjectives(UUID playerId);
+    List<ObjectiveData> getPlayerDailyObjectives(UUID playerId);
+
+    boolean isDailyObjectiveCompleted(UUID playerId, String objectiveId);
+
+    boolean isDailyObjectiveExists(UUID playerId, String objectiveId);
+
+    void generateDailyObjectives(UUID playerId);
     //#endregion
 
     //#region Weekly Objectives
@@ -50,20 +54,24 @@ public interface IDatabase {
 
     void updatePlayerWeeklyObjective(UUID playerId, String objectiveId, boolean isCompleted);
 
-    boolean hasPlayerCompletedWeeklyObjective(UUID playerId, String objectiveId);
-
     void wipePlayerWeeklyObjectives();
 
-    List<WeeklyObjectiveData> getPlayerWeeklyObjectives(UUID playerId);
+    List<ObjectiveData> getPlayerWeeklyObjectives(UUID playerId);
+
+    boolean isWeeklyObjectiveCompleted(UUID playerId, String objectiveId);
+
+    boolean isWeeklyObjectiveExists(UUID playerId, String objectiveId);
+
+    void generateWeeklyObjectives(UUID playerId);
     //#endregion
 
     //#region Completed Achievements
     void addCompletedAchievement(UUID playerId, String achievementId);
 
-    boolean hasPlayerCompletedAchievement(UUID playerId, String achievementId);
-
     void wipeCompletedAchievements();
 
-    List<CompletedAchievementData> getPlayerCompletedAchievements(UUID playerId);
+    List<String> getPlayerCompletedAchievements(UUID playerId);
+
+    boolean isAchievementCompleted(UUID playerId, String achievementId);
     //#endregion
 }

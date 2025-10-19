@@ -1,29 +1,50 @@
 package io.github.tavstaldev.bedWarsQuests.database;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.github.tavstaldev.bedWarsQuests.BWQConfiguration;
 import io.github.tavstaldev.bedWarsQuests.BedWarsQuests;
-import io.github.tavstaldev.bedWarsQuests.models.database.CompletedAchievementData;
-import io.github.tavstaldev.bedWarsQuests.models.database.DailyObjectiveData;
+import io.github.tavstaldev.bedWarsQuests.models.database.ObjectiveData;
 import io.github.tavstaldev.bedWarsQuests.models.database.PlayerData;
-import io.github.tavstaldev.bedWarsQuests.models.database.WeeklyObjectiveData;
 import io.github.tavstaldev.minecorelib.core.PluginLogger;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 // TODO: Add documentation
 public class MySqlDatabase implements IDatabase {
-    // TODO: Implement cache
     private HikariDataSource _dataSource;
     private BWQConfiguration _config;
     private final PluginLogger _logger = BedWarsQuests.Logger().withModule(MySqlDatabase.class);
+    //#region Caches
+    // Note: cache durations should be reduced if there are multiple servers using the same database
+    private final Cache<@NotNull UUID, PlayerData> _playerCache = Caffeine.newBuilder()
+            .maximumSize(1000)
+            .expireAfterWrite(5, TimeUnit.MINUTES)
+            .build();
+    private final Cache<@NotNull UUID, List<String>> _completedAchievementCache = Caffeine.newBuilder()
+            .maximumSize(1000)
+            .expireAfterWrite(5, TimeUnit.MINUTES)
+            .build();
+    private final Cache<@NotNull UUID, List<ObjectiveData>> _dailyObjectiveCache = Caffeine.newBuilder()
+            .maximumSize(1000)
+            .expireAfterWrite(5, TimeUnit.MINUTES)
+            .build();
+    private final Cache<@NotNull UUID, List<ObjectiveData>> _weeklyObjectiveCache = Caffeine.newBuilder()
+            .maximumSize(1000)
+            .expireAfterWrite(5, TimeUnit.MINUTES)
+            .build();
+    //#endregion
 
     @Override
     public void load() {
@@ -126,6 +147,8 @@ public class MySqlDatabase implements IDatabase {
                 // Execute the query
                 statement.executeUpdate();
             }
+
+            _playerCache.put(playerId, new PlayerData(playerId, 0, 0, 0));
         }
         catch (Exception ex)
         {
@@ -146,6 +169,8 @@ public class MySqlDatabase implements IDatabase {
                 statement.setString(4, playerId.toString());
                 statement.executeUpdate();
             }
+
+            _playerCache.put(playerId, new PlayerData(playerId, achievementPoints, completedDailyObjectives, completedWeeklyObjectives));
         }
         catch (Exception ex)
         {
@@ -162,6 +187,8 @@ public class MySqlDatabase implements IDatabase {
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.executeUpdate();
             }
+
+            _playerCache.invalidateAll();
         }
         catch (Exception ex)
         {
@@ -184,6 +211,19 @@ public class MySqlDatabase implements IDatabase {
         catch (Exception ex)
         {
             _logger.error(String.format("Unknown error happened while increasing achievement points in playerData table...\n%s", ex.getMessage()));
+            return;
+        }
+
+        var playerData = _playerCache.getIfPresent(playerId);
+        if (playerData != null) {
+            playerData.AchievementPoints += points;
+            _playerCache.put(playerId, playerData);
+        }
+        else {
+            PlayerData newData = getPlayerData(playerId);
+            if (newData != null) {
+                _playerCache.put(playerId, newData);
+            }
         }
     }
 
@@ -201,6 +241,19 @@ public class MySqlDatabase implements IDatabase {
         catch (Exception ex)
         {
             _logger.error(String.format("Unknown error happened while increasing completed daily objectives in playerData table...\n%s", ex.getMessage()));
+            return;
+        }
+
+        var playerData = _playerCache.getIfPresent(playerId);
+        if (playerData != null) {
+            playerData.CompletedDailyObjectives += 1;
+            _playerCache.put(playerId, playerData);
+        }
+        else {
+            PlayerData newData = getPlayerData(playerId);
+            if (newData != null) {
+                _playerCache.put(playerId, newData);
+            }
         }
     }
 
@@ -218,11 +271,29 @@ public class MySqlDatabase implements IDatabase {
         catch (Exception ex)
         {
             _logger.error(String.format("Unknown error happened while increasing completed weekly objectives in playerData table...\n%s", ex.getMessage()));
+            return;
+        }
+
+        var playerData = _playerCache.getIfPresent(playerId);
+        if (playerData != null) {
+            playerData.CompletedWeeklyObjectives += 1;
+            _playerCache.put(playerId, playerData);
+        }
+        else {
+            PlayerData newData = getPlayerData(playerId);
+            if (newData != null) {
+                _playerCache.put(playerId, newData);
+            }
         }
     }
 
     @Override
     public @Nullable PlayerData getPlayerData(UUID playerId) {
+        var cachedData = _playerCache.getIfPresent(playerId);
+        if (cachedData != null) {
+            return cachedData;
+        }
+
         PlayerData data = null;
         try (Connection connection = _dataSource.getConnection())
         {
@@ -248,9 +319,30 @@ public class MySqlDatabase implements IDatabase {
             return null;
         }
 
+        if (data != null) {
+            _playerCache.put(playerId, data);
+        }
         return data;
     }
     //#endregion
+
+    @Override
+    public @Nullable Boolean isWeeklyObjective(UUID playerId, String objectiveId) {
+        var weeklyObjectives = getPlayerWeeklyObjectives(playerId);
+        for (var obj : weeklyObjectives) {
+            if (obj.ObjectiveId.equals(objectiveId)) {
+                return true;
+            }
+        }
+
+        var dailyObjectives = getPlayerDailyObjectives(playerId);
+        for (var obj : dailyObjectives) {
+            if (obj.ObjectiveId.equals(objectiveId)) {
+                return false;
+            }
+        }
+        return null;
+    }
 
     //#region Daily Objectives
     @Override
@@ -274,6 +366,21 @@ public class MySqlDatabase implements IDatabase {
         catch (Exception ex)
         {
             _logger.error(String.format("Unknown error happened while adding dailyObjective...\n%s", ex.getMessage()));
+            return;
+        }
+
+        var objectives = _dailyObjectiveCache.getIfPresent(playerId);
+        if (objectives != null) {
+            objectives.add(new ObjectiveData(playerId, objectiveId, false));
+            _dailyObjectiveCache.put(playerId, objectives);
+        }
+        else {
+            List<ObjectiveData> newObjectives = getPlayerDailyObjectives(playerId);
+            if (newObjectives == null) {
+                newObjectives = new ArrayList<>();
+            }
+            newObjectives.add(new ObjectiveData(playerId, objectiveId, false));
+            _dailyObjectiveCache.put(playerId, newObjectives);
         }
     }
 
@@ -293,33 +400,27 @@ public class MySqlDatabase implements IDatabase {
         catch (Exception ex)
         {
             _logger.error(String.format("Unknown error happened while updating the dailyObjectiveData table...\n%s", ex.getMessage()));
+            return;
         }
-    }
 
-    @Override
-    public boolean hasPlayerCompletedDailyObjective(UUID playerId, String objectiveId) {
-        boolean data = false;
-        try (Connection connection = _dataSource.getConnection())
-        {
-            String sql = String.format("SELECT * FROM %s_daily_obj WHERE PlayerId=? AND ObjectiveId=? LIMIT 1;",
-                    _config.storageTablePrefix);
-            try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, playerId.toString());
-                statement.setString(2, objectiveId);
-                try (ResultSet result = statement.executeQuery()) {
-                    if (result.next()) {
-                        data = result.getBoolean("IsCompleted");
-                    }
+        var objectives = _dailyObjectiveCache.getIfPresent(playerId);
+        if (objectives != null) {
+            for (var obj : objectives) {
+                if (obj.ObjectiveId.equals(objectiveId)) {
+                    obj.IsCompleted = isCompleted;
+                    break;
                 }
             }
+            _dailyObjectiveCache.put(playerId, objectives);
         }
-        catch (Exception ex)
-        {
-            _logger.error(String.format("Unknown error happened while finding dailyObjectiveData...\n%s", ex.getMessage()));
-            return false;
+        else {
+            List<ObjectiveData> newObjectives = getPlayerDailyObjectives(playerId);
+            if (newObjectives == null) {
+                newObjectives = new ArrayList<>();
+            }
+            newObjectives.add(new ObjectiveData(playerId, objectiveId, isCompleted));
+            _dailyObjectiveCache.put(playerId, newObjectives);
         }
-
-        return data;
     }
 
     @Override
@@ -331,6 +432,7 @@ public class MySqlDatabase implements IDatabase {
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.executeUpdate();
             }
+            _dailyObjectiveCache.invalidateAll();
         }
         catch (Exception ex)
         {
@@ -339,8 +441,13 @@ public class MySqlDatabase implements IDatabase {
     }
 
     @Override
-    public List<DailyObjectiveData> getPlayerDailyObjectives(UUID playerId) {
-        List<DailyObjectiveData> data = new ArrayList<>();
+    public List<ObjectiveData> getPlayerDailyObjectives(UUID playerId) {
+        var dailyObjectives = _dailyObjectiveCache.getIfPresent(playerId);
+        if (dailyObjectives != null) {
+            return dailyObjectives;
+        }
+
+        List<ObjectiveData> data = new ArrayList<>();
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("SELECT * FROM %s_daily_obj WHERE PlayerId=?;",
@@ -349,7 +456,7 @@ public class MySqlDatabase implements IDatabase {
                 statement.setString(1, playerId.toString());
                 try (ResultSet result = statement.executeQuery()) {
                     while (result.next()) {
-                        data.add(new DailyObjectiveData(
+                        data.add(new ObjectiveData(
                                 UUID.fromString(result.getString("PlayerId")),
                                 result.getString("ObjectiveId"),
                                 result.getBoolean("IsCompleted")
@@ -364,7 +471,52 @@ public class MySqlDatabase implements IDatabase {
             return null;
         }
 
+        _dailyObjectiveCache.put(playerId, data);
         return data;
+    }
+
+    @Override
+    public boolean isDailyObjectiveCompleted(UUID playerId, String objectiveId) {
+        var objectives = getPlayerDailyObjectives(playerId);
+        for (var obj : objectives) {
+            if (obj.ObjectiveId.equals(objectiveId)) {
+                return obj.IsCompleted;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean isDailyObjectiveExists(UUID playerId, String objectiveId) {
+        var objectives = getPlayerDailyObjectives(playerId);
+        for (var obj : objectives) {
+            if (obj.ObjectiveId.equals(objectiveId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public void generateDailyObjectives(UUID playerId) {
+        final var currentDailyObjectives = getPlayerDailyObjectives(playerId);
+        // Wipe existing daily objectives from cache
+        _dailyObjectiveCache.invalidate(playerId);
+
+        var objectives = BedWarsQuests.ObjectiveManager().getObjectives();
+        if (!currentDailyObjectives.isEmpty()) {
+            for (var weeklyObj : currentDailyObjectives) {
+                objectives.removeIf(obj -> obj.Id.equals(weeklyObj.ObjectiveId));
+            }
+        }
+
+        Collections.shuffle(objectives);
+        int numToTake = Math.min(3, objectives.size());
+        for (var item : objectives.subList(0, numToTake)) {
+            addPlayerDailyObjective(playerId, item.Id);
+        }
     }
     //#endregion
 
@@ -390,6 +542,21 @@ public class MySqlDatabase implements IDatabase {
         catch (Exception ex)
         {
             _logger.error(String.format("Unknown error happened while adding weeklyObjective...\n%s", ex.getMessage()));
+            return;
+        }
+
+        var objectives = _weeklyObjectiveCache.getIfPresent(playerId);
+        if (objectives != null) {
+            objectives.add(new ObjectiveData(playerId, objectiveId, false));
+            _weeklyObjectiveCache.put(playerId, objectives);
+        }
+        else {
+            List<ObjectiveData> newObjectives = getPlayerWeeklyObjectives(playerId);
+            if (newObjectives == null) {
+                newObjectives = new ArrayList<>();
+            }
+            newObjectives.add(new ObjectiveData(playerId, objectiveId, false));
+            _weeklyObjectiveCache.put(playerId, newObjectives);
         }
     }
 
@@ -408,34 +575,28 @@ public class MySqlDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.error(String.format("Unknown error happened while updating the weeklyObjectiveData table...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while updating the objectiveData table...\n%s", ex.getMessage()));
+            return;
         }
-    }
 
-    @Override
-    public boolean hasPlayerCompletedWeeklyObjective(UUID playerId, String objectiveId) {
-        boolean data = false;
-        try (Connection connection = _dataSource.getConnection())
-        {
-            String sql = String.format("SELECT * FROM %s_weekly_obj WHERE PlayerId=? AND ObjectiveId=? LIMIT 1;",
-                    _config.storageTablePrefix);
-            try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, playerId.toString());
-                statement.setString(2, objectiveId);
-                try (ResultSet result = statement.executeQuery()) {
-                    if (result.next()) {
-                        data = result.getBoolean("IsCompleted");
-                    }
+        var objectives = _weeklyObjectiveCache.getIfPresent(playerId);
+        if (objectives != null) {
+            for (var obj : objectives) {
+                if (obj.ObjectiveId.equals(objectiveId)) {
+                    obj.IsCompleted = isCompleted;
+                    break;
                 }
             }
+            _weeklyObjectiveCache.put(playerId, objectives);
         }
-        catch (Exception ex)
-        {
-            _logger.error(String.format("Unknown error happened while finding weeklyObjectiveData...\n%s", ex.getMessage()));
-            return false;
+        else {
+            List<ObjectiveData> newObjectives = getPlayerWeeklyObjectives(playerId);
+            if (newObjectives == null) {
+                newObjectives = new ArrayList<>();
+            }
+            newObjectives.add(new ObjectiveData(playerId, objectiveId, isCompleted));
+            _weeklyObjectiveCache.put(playerId, newObjectives);
         }
-
-        return data;
     }
 
     @Override
@@ -447,16 +608,22 @@ public class MySqlDatabase implements IDatabase {
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.executeUpdate();
             }
+
+            _weeklyObjectiveCache.invalidateAll();
         }
         catch (Exception ex)
         {
-            _logger.error(String.format("Unknown error happened while wiping weeklyObjectiveData...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while wiping objectiveData...\n%s", ex.getMessage()));
         }
     }
 
     @Override
-    public List<WeeklyObjectiveData> getPlayerWeeklyObjectives(UUID playerId) {
-        List<WeeklyObjectiveData> data = new ArrayList<>();
+    public List<ObjectiveData> getPlayerWeeklyObjectives(UUID playerId) {
+        var weeklyObjectives = _weeklyObjectiveCache.getIfPresent(playerId);
+        if (weeklyObjectives != null) {
+            return weeklyObjectives;
+        }
+        List<ObjectiveData> data = new ArrayList<>();
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("SELECT * FROM %s_weekly_obj WHERE PlayerId=?;",
@@ -465,7 +632,7 @@ public class MySqlDatabase implements IDatabase {
                 statement.setString(1, playerId.toString());
                 try (ResultSet result = statement.executeQuery()) {
                     while (result.next()) {
-                        data.add(new WeeklyObjectiveData(
+                        data.add(new ObjectiveData(
                                 UUID.fromString(result.getString("PlayerId")),
                                 result.getString("ObjectiveId"),
                                 result.getBoolean("IsCompleted")
@@ -476,11 +643,54 @@ public class MySqlDatabase implements IDatabase {
         }
         catch (Exception ex)
         {
-            _logger.error(String.format("Unknown error happened while getting weeklyObjectiveData...\n%s", ex.getMessage()));
+            _logger.error(String.format("Unknown error happened while getting objectiveData...\n%s", ex.getMessage()));
             return null;
         }
 
+        _weeklyObjectiveCache.put(playerId, data);
         return data;
+    }
+
+    @Override
+    public boolean isWeeklyObjectiveCompleted(UUID playerId, String objectiveId) {
+        var objectives = getPlayerWeeklyObjectives(playerId);
+        for (var obj : objectives) {
+            if (obj.ObjectiveId.equals(objectiveId)) {
+                return obj.IsCompleted;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isWeeklyObjectiveExists(UUID playerId, String objectiveId) {
+        var objectives = getPlayerWeeklyObjectives(playerId);
+        for (var obj : objectives) {
+            if (obj.ObjectiveId.equals(objectiveId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void generateWeeklyObjectives(UUID playerId) {
+        final var currentWeeklyObjectives = getPlayerWeeklyObjectives(playerId);
+        // Wipe existing weekly objectives from cache
+        _weeklyObjectiveCache.invalidate(playerId);
+
+        var objectives = BedWarsQuests.ObjectiveManager().getObjectives();
+        if (!currentWeeklyObjectives.isEmpty()) {
+            for (var weeklyObj : currentWeeklyObjectives) {
+                objectives.removeIf(obj -> obj.Id.equals(weeklyObj.ObjectiveId));
+            }
+        }
+
+        Collections.shuffle(objectives);
+        int numToTake = Math.min(3, objectives.size());
+        for (var item : objectives.subList(0, numToTake)) {
+            addPlayerWeeklyObjective(playerId, item.Id);
+        }
     }
     //#endregion
 
@@ -505,6 +715,21 @@ public class MySqlDatabase implements IDatabase {
         catch (Exception ex)
         {
             _logger.error(String.format("Unknown error happened while adding completedAchievement...\n%s", ex.getMessage()));
+            return;
+        }
+
+        var completedAchievements = _completedAchievementCache.getIfPresent(playerId);
+        if (completedAchievements != null) {
+            completedAchievements.add(achievementId);
+            _completedAchievementCache.put(playerId, completedAchievements);
+        }
+        else {
+            List<String> newCompletedAchievements = getPlayerCompletedAchievements(playerId);
+            if (newCompletedAchievements == null) {
+                newCompletedAchievements = new ArrayList<>();
+            }
+            newCompletedAchievements.add(achievementId);
+            _completedAchievementCache.put(playerId, newCompletedAchievements);
         }
     }
 
@@ -517,6 +742,7 @@ public class MySqlDatabase implements IDatabase {
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.executeUpdate();
             }
+            _completedAchievementCache.invalidateAll();
         }
         catch (Exception ex)
         {
@@ -525,35 +751,13 @@ public class MySqlDatabase implements IDatabase {
     }
 
     @Override
-    public boolean hasPlayerCompletedAchievement(UUID playerId, String achievementId) {
-        boolean data = false;
-        try (Connection connection = _dataSource.getConnection())
-        {
-            String sql = String.format("SELECT * FROM %s_comp_achievements WHERE PlayerId=? AND AchievementId=? LIMIT 1;",
-                    _config.storageTablePrefix);
-            try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, playerId.toString());
-                statement.setString(2, achievementId);
-                try (ResultSet result = statement.executeQuery()) {
-                    if (result == null)
-                        return false;
-                    if (result.next()) {
-                        data = true;
-                    }
-                }
-            }
+    public List<String> getPlayerCompletedAchievements(UUID playerId) {
+        var completedAchievements = _completedAchievementCache.getIfPresent(playerId);
+        if (completedAchievements != null) {
+            return completedAchievements;
         }
-        catch (Exception ex)
-        {
-            _logger.error(String.format("Unknown error happened while finding completedAchievementData...\n%s", ex.getMessage()));
-            return false;
-        }
-        return data;
-    }
 
-    @Override
-    public List<CompletedAchievementData> getPlayerCompletedAchievements(UUID playerId) {
-        List<CompletedAchievementData> data = new ArrayList<>();
+        List<String> data = new ArrayList<>();
         try (Connection connection = _dataSource.getConnection())
         {
             String sql = String.format("SELECT * FROM %s_comp_achievements WHERE PlayerId=?;",
@@ -562,10 +766,7 @@ public class MySqlDatabase implements IDatabase {
                 statement.setString(1, playerId.toString());
                 try (ResultSet result = statement.executeQuery()) {
                     while (result.next()) {
-                        data.add(new CompletedAchievementData(
-                                UUID.fromString(result.getString("PlayerId")),
-                                result.getString("AchievementId")
-                        ));
+                        data.add(result.getString("AchievementId"));
                     }
                 }
             }
@@ -575,8 +776,20 @@ public class MySqlDatabase implements IDatabase {
             _logger.error(String.format("Unknown error happened while getting completedAchievementData...\n%s", ex.getMessage()));
             return null;
         }
+
+        _completedAchievementCache.put(playerId, data);
         return data;
     }
 
+    @Override
+    public boolean isAchievementCompleted(UUID playerId, String achievementId) {
+        var completedList = getPlayerCompletedAchievements(playerId);
+        for (var achId : completedList) {
+            if (achId.equals(achievementId)) {
+                return true;
+            }
+        }
+        return  false;
+    }
     //#endregion
 }

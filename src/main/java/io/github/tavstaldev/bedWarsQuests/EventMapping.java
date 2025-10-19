@@ -4,7 +4,6 @@ import io.github.tavstaldev.bedWarsQuests.managers.PlayerCacheManager;
 import io.github.tavstaldev.bedWarsQuests.models.Achievement;
 import io.github.tavstaldev.bedWarsQuests.models.ECompletionKind;
 import io.github.tavstaldev.bedWarsQuests.models.PlayerCache;
-import io.github.tavstaldev.bedWarsQuests.models.database.CompletedAchievementData;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -77,14 +76,12 @@ public class EventMapping {
         // Process achievements associated with the event trigger.
         List<Achievement> achievements = BedWarsQuests.AchievementManager().getAchievementsByTrigger(trigger);
         for (Achievement achievement : achievements) {
-            if (cache.isAchievementCompleted(achievement.Id))
+            if (BedWarsQuests.Database().isAchievementCompleted(playerUuid, achievement.Id))
                 continue;
 
             // Check if the achievement criteria are satisfied.
             if (achievement.Criteria.isSatisfied(player, event, true)) {
                 BedWarsQuests.Database().addCompletedAchievement(playerUuid, achievement.Id);
-                // Save to cache.
-                cache.addAchievement(new CompletedAchievementData(playerUuid, achievement.Id));
                 achievement.complete(player, ECompletionKind.Achievement);
             }
         }
@@ -94,7 +91,7 @@ public class EventMapping {
         for (Achievement objective : objectives) {
 
             // Check if the player has the objective and whether it is weekly.
-            Boolean isWeekly = cache.isWeeklyObjective(objective.Id);
+            Boolean isWeekly = BedWarsQuests.Database().isWeeklyObjective(playerUuid, objective.Id);
             if (isWeekly == null) // The player does not have this objective.
                 continue;
 
@@ -104,21 +101,17 @@ public class EventMapping {
 
             if (isWeekly) {
                 // Handle weekly objectives.
-                if (cache.isWeeklyObjectiveCompleted(objective.Id))
+                if (BedWarsQuests.Database().isWeeklyObjectiveCompleted(playerUuid, objective.Id))
                     continue;
 
                 BedWarsQuests.Database().updatePlayerWeeklyObjective(playerUuid, objective.Id, true);
-                // Update in cache.
-                cache.completeWeeklyObjective(objective.Id);
                 objective.complete(player, ECompletionKind.WeeklyObjective);
             } else {
                 // Handle daily objectives.
-                if (cache.isDailyObjectiveCompleted(objective.Id))
+                if (BedWarsQuests.Database().isDailyObjectiveCompleted(playerUuid, objective.Id))
                     continue;
 
                 BedWarsQuests.Database().updatePlayerDailyObjective(playerUuid, objective.Id, true);
-                // Update in cache.
-                cache.completeDailyObjective(objective.Id);
                 objective.complete(player, ECompletionKind.DailyObjective);
             }
         }

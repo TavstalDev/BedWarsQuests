@@ -5,8 +5,7 @@ import com.samjakob.spigui.menu.SGMenu;
 import io.github.tavstaldev.bedWarsQuests.BWQConfiguration;
 import io.github.tavstaldev.bedWarsQuests.BedWarsQuests;
 import io.github.tavstaldev.bedWarsQuests.managers.PlayerCacheManager;
-import io.github.tavstaldev.bedWarsQuests.models.database.DailyObjectiveData;
-import io.github.tavstaldev.bedWarsQuests.models.database.WeeklyObjectiveData;
+import io.github.tavstaldev.bedWarsQuests.models.database.ObjectiveData;
 import io.github.tavstaldev.minecorelib.core.PluginLogger;
 import io.github.tavstaldev.minecorelib.core.PluginTranslator;
 import io.github.tavstaldev.minecorelib.utils.ChatUtils;
@@ -129,15 +128,16 @@ public class MainGUI {
             BWQConfiguration config = BedWarsQuests.Config();
 
             // Populate the GUI with daily quests.
+            final var dailyObjectives = BedWarsQuests.Database().getPlayerDailyObjectives(playerId);
             for (int i = 0; i < 3; i++) {
                 int slot = i + 10;
 
-                if (i >= playerCache.getDailyObjectives().size()) {
+                if (i >= dailyObjectives.size()) {
                     menu.removeButton(slot);
                     continue;
                 }
 
-                DailyObjectiveData dailyObjectiveData = playerCache.getDailyObjectives().get(i);
+                ObjectiveData dailyObjectiveData = dailyObjectives.get(i);
                 if (dailyObjectiveData == null) {
                     menu.removeButton(slot);
                     continue;
@@ -182,27 +182,28 @@ public class MainGUI {
             }
 
             // Populate the GUI with weekly quests.
+            final var weeklyObjectives = BedWarsQuests.Database().getPlayerWeeklyObjectives(playerId);
             for (int i = 0; i < 3; i++) {
                 int slot = i + 14;
 
-                if (i >= playerCache.getWeeklyObjectives().size()) {
+                if (i >= weeklyObjectives.size()) {
                     menu.removeButton(slot);
                     continue;
                 }
 
-                WeeklyObjectiveData weeklyObjectiveData = playerCache.getWeeklyObjectives().get(i);
-                if (weeklyObjectiveData == null) {
+                ObjectiveData objectiveData = weeklyObjectives.get(i);
+                if (objectiveData == null) {
                     menu.removeButton(slot);
                     continue;
                 }
 
-                Material questMaterial = weeklyObjectiveData.IsCompleted
+                Material questMaterial = objectiveData.IsCompleted
                         ? config.guiCompletedWeeklyQuestItem
                         : config.guiWeeklyQuestItem;
 
-                var objective = BedWarsQuests.ObjectiveManager().getObjectiveById(weeklyObjectiveData.ObjectiveId);
+                var objective = BedWarsQuests.ObjectiveManager().getObjectiveById(objectiveData.ObjectiveId);
                 if (objective == null) {
-                    _logger.warn("Objective with ID " + weeklyObjectiveData.ObjectiveId + " not found for player " + player.getName());
+                    _logger.warn("Objective with ID " + objectiveData.ObjectiveId + " not found for player " + player.getName());
                     menu.removeButton(slot);
                     continue;
                 }
@@ -210,7 +211,7 @@ public class MainGUI {
                 var rawRole = _translator.localizeList(player, "GUI.WeeklyQuestLore");
                 String[] descriptionLines = objective.Description.split("\n");
                 List<Component> lore = new ArrayList<>();
-                String status = _translator.localize(player, weeklyObjectiveData.IsCompleted ? "GUI.Completed" : "GUI.InProgress");
+                String status = _translator.localize(player, objectiveData.IsCompleted ? "GUI.Completed" : "GUI.InProgress");
 
                 for (String line : rawRole) {
                     if (line.contains("%quest_description%")) {

@@ -1,8 +1,6 @@
 package io.github.tavstaldev.bedWarsQuests.tasks;
 
 import io.github.tavstaldev.bedWarsQuests.BedWarsQuests;
-import io.github.tavstaldev.bedWarsQuests.managers.PlayerCacheManager;
-import io.github.tavstaldev.bedWarsQuests.models.PlayerCache;
 import io.github.tavstaldev.minecorelib.config.ConfigurationBase;
 import org.bukkit.Bukkit;
 
@@ -52,11 +50,7 @@ public class RefreshTask implements Runnable {
 
             // Generate new daily objectives for online players.
             for (var player : Bukkit.getOnlinePlayers()) {
-                PlayerCache cache = PlayerCacheManager.get(player.getUniqueId());
-                if (cache == null)
-                    continue;
-
-                cache.generateDailyObjectives();
+                BedWarsQuests.Database().generateDailyObjectives(player.getUniqueId());
             }
         }
 
@@ -72,11 +66,7 @@ public class RefreshTask implements Runnable {
 
             // Generate new weekly objectives for online players.
             for (var player : Bukkit.getOnlinePlayers()) {
-                PlayerCache cache = PlayerCacheManager.get(player.getUniqueId());
-                if (cache == null)
-                    continue;
-
-                cache.generateWeeklyObjectives();
+                BedWarsQuests.Database().generateWeeklyObjectives(player.getUniqueId());
             }
         }
 

@@ -176,7 +176,7 @@ public class AchievementGUI {
                 }
 
                 var achievement = achievements.get(index);
-                boolean isCompleted = playerCache.isAchievementCompleted(achievement.Id);
+                boolean isCompleted = BedWarsQuests.Database().isAchievementCompleted(playerId, achievement.Id);
                 Material material = isCompleted ? config.guiCompletedAchievementItem : config.guiLockedAchievementItem;
 
                 String displayName = BedWarsQuests.Translator().localize(player, isCompleted ? "GUI.AchievementData.UnlockedName" : "GUI.AchievementData.LockedName", Map.of("achievement_name", achievement.Name));
