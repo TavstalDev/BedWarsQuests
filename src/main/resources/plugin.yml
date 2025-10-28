@@ -1,5 +1,5 @@
 main: io.github.tavstaldev.bedWarsQuests.BedWarsQuests
-version: 1.0.3
+version: 1.0.4
 
 name: BedWarsQuests
 api-version: '1.21'

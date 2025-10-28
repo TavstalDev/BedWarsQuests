@@ -11,6 +11,7 @@ import io.github.tavstaldev.bedWarsQuests.events.BlockEventListener;
 import io.github.tavstaldev.bedWarsQuests.events.PlayerEventListener;
 import io.github.tavstaldev.bedWarsQuests.managers.AchievementManager;
 import io.github.tavstaldev.bedWarsQuests.managers.ObjectiveManager;
+import io.github.tavstaldev.bedWarsQuests.metrics.Metrics;
 import io.github.tavstaldev.bedWarsQuests.tasks.CacheCleanTask;
 import io.github.tavstaldev.bedWarsQuests.tasks.RefreshTask;
 import io.github.tavstaldev.bedWarsQuests.utils.EconomyUtils;
@@ -245,6 +246,15 @@ public class BedWarsQuests extends PluginBase {
             cacheCleanTask.cancel();
         cacheCleanTask = new CacheCleanTask(); // Runs every 5 minutes
         cacheCleanTask.runTaskTimer(this, 0, 5 * 60 * 20);
+
+        // Metrics
+        try {
+            @SuppressWarnings("unused") Metrics metrics = new Metrics(this, 27757);
+        }
+        catch (Exception ex)
+        {
+            _logger.error("Failed to start Metrics: " + ex.getMessage());
+        }
 
         _logger.ok(String.format("%s has been successfully loaded.", getProjectName()));
         if (Config().checkForUpdates) {
